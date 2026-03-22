@@ -6,8 +6,15 @@ const path = require('path');
 // ── FIREBASE ──
 let serviceAccount;
 try {
-  serviceAccount = JSON.parse(fs.readFileSync(path.join(__dirname, 'serviceAccountKey.json'), 'utf8'));
-  console.log('✅ Firebase ключ загружен');
+  if (process.env.SERVICE_ACCOUNT_KEY) {
+    // Railway — читаем из переменной окружения
+    serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
+    console.log('✅ Firebase ключ загружен из ENV');
+  } else {
+    // Локально — читаем из файла
+    serviceAccount = JSON.parse(fs.readFileSync(path.join(__dirname, 'serviceAccountKey.json'), 'utf8'));
+    console.log('✅ Firebase ключ загружен из файла');
+  }
 } catch (error) {
   console.error('❌ Ошибка загрузки ключа:', error.message);
   process.exit(1);
