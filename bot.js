@@ -392,19 +392,46 @@ bot.launch();
 console.log('✅ Бот запущен! Жду новых заявок...');
 
 // Попробуем Realtime WS, если пакет ws доступен
-try {
-  require('ws');
-  startRealtimeWatch();
-  console.log('📡 Используем Supabase Realtime (WebSocket)');
-} catch (_) {
-  // ws не установлен — используем polling каждые 15 секунд
-  console.log('⚠️ Пакет ws не найден — используем polling (каждые 15с)');
-  // Первый запуск — запомнить текущие pending без уведомлений
-  db.select('services', 'status=eq.pending&order=created_at.asc').then(rows => {
-    if (rows && rows.length > 0) lastSeenId = rows[rows.length - 1].id;
-    setInterval(pollPending, 15_000);
-  }).catch(() => setInterval(pollPending, 15_000));
+// Polling каждые 10 секунд
+const seenIds = new Set();
+
+async function pollPending() {
+  try {
+    const rows = await db.select('services', 'status=eq.pending&order=created_at.asc');
+    if (!rows || rows.length === 0) return;
+
+    for (const d of rows) {
+      if (seenIds.has(d.id)) continue;
+      seenIds.add(d.id);
+
+      const phLine = d.phone     ? `\n📞 *${d.phone}*`       : '';
+      const tgLine = d.telegram  ? `\n✈️ @${d.telegram}`     : '';
+      const spLine = d.specialty ? `\n🎯 *${d.specialty}*`   : '';
+      const dsLine = d.description ? `\n📝 ${d.description}` : '';
+
+      const text =
+        `🚨 *НОВАЯ ЗАЯВКА*\n\n👤 *${d.name}*\n📂 ${d.category}` +
+        spLine + phLine + tgLine + dsLine;
+
+      await bot.telegram.sendMessage(ADMIN_ID, text, {
+        parse_mode: 'Markdown',
+        ...Markup.inlineKeyboard([
+          [
+            Markup.button.callback('✅ Одобрить', `approve_${d.id}`),
+            Markup.button.callback('❌ Отклонить', `reject_${d.id}`)
+          ]
+        ])
+      });
+      console.log(`📨 Новая заявка: ${d.name} (${d.id})`);
+    }
+  } catch (err) {
+    console.error('Polling error:', err.message);
+  }
 }
 
-process.once('SIGINT',  () => { bot.stop('SIGINT');  console.log('⏹️ Остановлен'); });
-process.once('SIGTERM', () => { bot.stop('SIGTERM'); console.log('⏹️ Остановлен'); });
+// При старте — запомнить уже существующие pending без уведомлений
+db.select('services', 'status=eq.pending&order=created_at.asc').then(rows => {
+  if (rows) rows.forEach(r => seenIds.add(r.id));
+  console.log(`📊 При запуске в очереди: ${seenIds.size} заявок`);
+  setInterval(pollPending, 10_000);
+}).catch(() => setInterval(pollPending, 10_000));
