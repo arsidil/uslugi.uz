@@ -24,8 +24,8 @@ if (!BOT_TOKEN) {
 
 const bot = new Telegraf(BOT_TOKEN);
 
-// Сохранить пользователя в таблицу users (upsert — не дублирует)
-async function saveUser(chatId) {
+// Сохранить пользователя в таблицу users (upsert — обновляет username если изменился)
+async function saveUser(chatId, username) {
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/users`, {
       method: 'POST',
@@ -33,9 +33,9 @@ async function saveUser(chatId) {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'resolution=ignore-duplicates'
+        'Prefer': 'resolution=merge-duplicates'
       },
-      body: JSON.stringify({ chat_id: chatId })
+      body: JSON.stringify({ chat_id: chatId, username: username || null })
     });
   } catch (e) {
     console.error('saveUser error:', e.message);
@@ -54,7 +54,7 @@ const appButton = () => Markup.inlineKeyboard([
 ]);
 
 bot.start(async ctx => {
-  await saveUser(ctx.chat.id);
+  await saveUser(ctx.chat.id, ctx.from?.username);
   return ctx.reply(WELCOME_TEXT, { parse_mode: 'Markdown', ...appButton() });
 });
 
