@@ -5,7 +5,6 @@ const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxc2Jxc2l6YnpjZGRiemJhaWd3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDEwNTkyOCwiZXhwIjoyMDg5NjgxOTI4fQ.IX0mzMND498fXhaYQ3RUgkp-1OIw_6PLU9xiJGtgOF4';
 
 const MAIN_BOT_TOKEN  = process.env.MAIN_BOT_TOKEN || '';
-const POST_CHAT_ID    = process.env.POST_CHAT_ID || '';
 const ADMIN_PASSWORD  = 'USLUGI 1207';
 
 async function sbFetch(path, opts={}) {
@@ -37,10 +36,8 @@ const bot = new Telegraf(BOT_TOKEN);
 const UUID_RE = /^(approve|reject|delete)_(.+)$/;
 const authedAdmins = new Set();
 
-let postDraftText = null;
-let postDraftAwaiting = false;
-let postEditPublishedAwaiting = false;
-let lastChannelPost = null;
+let broadcastDraftText = null;
+let broadcastAwaiting = false;
 
 async function mainBotRequest(method, body) {
   const r = await fetch(`https://api.telegram.org/bot${MAIN_BOT_TOKEN}/${method}`, {
@@ -58,7 +55,7 @@ function mainMenuKeyboard() {
     [Markup.button.callback('📋 Ожидают проверки','pending_apps')],
     [Markup.button.callback('✅ Одобренные','approved_apps')],
     [Markup.button.callback('❌ Отклонённые','rejected_apps')],
-    [Markup.button.callback('📝 Пост в канал','channel_post')]
+    [Markup.button.callback('📢 Рассылка пользователям','broadcast')]
   ]);
 }
 
@@ -77,16 +74,17 @@ const HELP_TEXT =
 /help — эта справка
 /pending — все заявки в статусе «ожидают» с кнопками одобрить / отклонить
 /list — одобренные анкеты с кнопкой удаления с сайта
-/post — начать пост для канала (как кнопка «Пост в канал»)
-/cancel_post — отменить ввод или редактирование поста
+/broadcast — начать рассылку всем пользователям основного бота
+/cancel_post — отменить ввод текста рассылки
 
 *Кнопки меню:*
 • Ожидают проверки — краткая сводка и подсказка про /pending
 • Одобренные / Отклонённые — списки имён
-• Пост в канал — текст поста в чат основного бота (нужны MAIN\\_BOT\\_TOKEN и POST\\_CHAT\\_ID в окружении)
+• Рассылка — отправить сообщение всем пользователям основного бота
 
-*Черновик поста:* после текста появятся кнопки — Отправить, Изменить, Удалить черновик.
-*После публикации:* можно удалить или отредактировать сообщение на канале (пока бот помнит последний пост).`;
+*Для рассылки нужны:*
+MAIN\\_BOT\\_TOKEN (токен основного бота) в переменных окружения Railway.`;
+
 
 bot.use(async (ctx, next) => {
   if (!ctx.from || ctx.from.id !== ADMIN_ID) {
@@ -112,20 +110,19 @@ bot.command('help', async ctx => {
   return ctx.reply(HELP_TEXT, { parse_mode: 'Markdown' });
 });
 
-bot.command('post', async ctx => {
+bot.command('broadcast', async ctx => {
   if (!authedAdmins.has(ctx.from.id)) {
     return ctx.reply('🔐 Сначала введите пароль.');
   }
-  postDraftAwaiting = true;
-  postDraftText = null;
-  postEditPublishedAwaiting = false;
-  return ctx.reply('📝 Отправьте текст поста для канала.\n/cancel_post — отмена');
+  broadcastAwaiting = true;
+  broadcastDraftText = null;
+  return ctx.reply('📢 Отправьте текст рассылки.\nОн уйдёт всем пользователям основного бота.\n\n/cancel_post — отмена');
 });
 
 bot.command('cancel_post', async ctx => {
-  postDraftAwaiting = false;
-  postEditPublishedAwaiting = false;
-  return ctx.reply('✅ Режим поста отменён.');
+  broadcastAwaiting = false;
+  broadcastDraftText = null;
+  return ctx.reply('✅ Рассылка отменена.');
 });
 
 bot.on('text', async (ctx, next) => {
@@ -140,121 +137,86 @@ bot.on('text', async (ctx, next) => {
     return ctx.reply('❌ Неверный пароль.');
   }
 
-  if (postEditPublishedAwaiting) {
-    const text = ctx.message.text.trim();
-    if (!text) return ctx.reply('Пришлите непустой текст.');
-    if (!MAIN_BOT_TOKEN || !POST_CHAT_ID) {
-      postEditPublishedAwaiting = false;
-      return ctx.reply('❌ Не заданы MAIN_BOT_TOKEN или POST_CHAT_ID.');
-    }
-    if (!lastChannelPost) {
-      postEditPublishedAwaiting = false;
-      return ctx.reply('❌ Нет сохранённого поста для редактирования.');
-    }
-    try {
-      await mainBotRequest('editMessageText', {
-        chat_id: lastChannelPost.chat_id,
-        message_id: lastChannelPost.message_id,
-        text
-      });
-      postEditPublishedAwaiting = false;
-      return ctx.reply('✅ Пост на канале обновлён.', Markup.inlineKeyboard([
-        [Markup.button.callback('🗑 Удалить с канала', 'post_pub_del')],
-        [Markup.button.callback('✏️ Редактировать на канале', 'post_pub_edit')]
-      ]));
-    } catch (e) {
-      postEditPublishedAwaiting = false;
-      return ctx.reply('❌ ' + (e.message || 'Ошибка'));
-    }
-  }
-
-  if (postDraftAwaiting) {
-    postDraftText = ctx.message.text.trim();
-    postDraftAwaiting = false;
+  if (broadcastAwaiting) {
+    broadcastDraftText = ctx.message.text.trim();
+    broadcastAwaiting = false;
     return ctx.reply(
-      `📋 Черновик:\n\n${postDraftText}`,
-      { ...Markup.inlineKeyboard([
-        [Markup.button.callback('✅ Отправить', 'post_draft_send')],
+      `📋 Черновик рассылки:\n\n${broadcastDraftText}`,
+      Markup.inlineKeyboard([
+        [Markup.button.callback('📢 Разослать всем', 'broadcast_send')],
         [
-          Markup.button.callback('✏️ Изменить', 'post_draft_edit'),
-          Markup.button.callback('🗑 Удалить черновик', 'post_draft_discard')
+          Markup.button.callback('✏️ Изменить', 'broadcast_edit'),
+          Markup.button.callback('🗑 Отменить', 'broadcast_discard')
         ]
-      ]) }
+      ])
     );
   }
 
   return next();
 });
 
-bot.action('channel_post', async ctx => {
+bot.action('broadcast', async ctx => {
   if (!authedAdmins.has(ctx.from.id)) return ctx.answerCbQuery('⛔ Нет доступа');
   await ctx.answerCbQuery();
-  postDraftAwaiting = true;
-  postDraftText = null;
-  postEditPublishedAwaiting = false;
-  return ctx.reply('📝 Отправьте текст поста для канала.\n/cancel_post — отмена');
+  broadcastAwaiting = true;
+  broadcastDraftText = null;
+  return ctx.reply('📢 Отправьте текст рассылки.\nОн уйдёт всем пользователям основного бота.\n\n/cancel_post — отмена');
 });
 
-bot.action('post_draft_send', async ctx => {
+bot.action('broadcast_send', async ctx => {
   await ctx.answerCbQuery();
-  if (!postDraftText) return ctx.reply('Нет текста черновика.');
-  if (!MAIN_BOT_TOKEN || !POST_CHAT_ID) {
-    return ctx.reply('❌ Задайте переменные окружения MAIN_BOT_TOKEN и POST_CHAT_ID (id канала, напр. \\-100…).');
+  if (!broadcastDraftText) return ctx.reply('Нет текста рассылки.');
+  if (!MAIN_BOT_TOKEN) {
+    return ctx.reply('❌ Задайте MAIN_BOT_TOKEN в переменных окружения Railway (сервер админ-бота).');
   }
+
+  // Получаем всех пользователей из Supabase
+  let users = [];
   try {
-    const result = await mainBotRequest('sendMessage', {
-      chat_id: POST_CHAT_ID,
-      text: postDraftText
-    });
-    lastChannelPost = {
-      message_id: result.message_id,
-      chat_id: result.chat.id
-    };
-    postDraftText = null;
-    return ctx.editMessageText('✅ Пост опубликован.', {
-      ...Markup.inlineKeyboard([
-        [Markup.button.callback('🗑 Удалить с канала', 'post_pub_del')],
-        [Markup.button.callback('✏️ Редактировать на канале', 'post_pub_edit')]
-      ])
-    });
+    users = await db.select('users', 'select=chat_id');
   } catch (e) {
-    return ctx.reply('❌ ' + (e.message || 'Не удалось отправить'));
+    return ctx.reply('❌ Не удалось получить список пользователей: ' + e.message);
   }
-});
 
-bot.action('post_draft_discard', async ctx => {
-  await ctx.answerCbQuery();
-  postDraftText = null;
-  return ctx.editMessageText('🗑 Черновик удалён.');
-});
-
-bot.action('post_draft_edit', async ctx => {
-  await ctx.answerCbQuery();
-  postDraftAwaiting = true;
-  postDraftText = null;
-  return ctx.reply('✏️ Пришлите новый текст поста.');
-});
-
-bot.action('post_pub_del', async ctx => {
-  await ctx.answerCbQuery();
-  if (!lastChannelPost || !MAIN_BOT_TOKEN) return ctx.reply('❌ Нет поста или токена.');
-  try {
-    await mainBotRequest('deleteMessage', {
-      chat_id: lastChannelPost.chat_id,
-      message_id: lastChannelPost.message_id
-    });
-    lastChannelPost = null;
-    return ctx.reply('🗑 Пост удалён с канала.');
-  } catch (e) {
-    return ctx.reply('❌ ' + (e.message || 'Ошибка удаления'));
+  if (!users || !users.length) {
+    return ctx.reply('❌ Нет пользователей для рассылки. Возможно никто ещё не нажал /start в основном боте.');
   }
+
+  await ctx.editMessageText(`📢 Запускаю рассылку для ${users.length} пользователей...`);
+
+  let ok = 0, fail = 0;
+  for (const u of users) {
+    try {
+      await mainBotRequest('sendMessage', {
+        chat_id: u.chat_id,
+        text: broadcastDraftText,
+        parse_mode: 'Markdown'
+      });
+      ok++;
+    } catch (e) {
+      fail++;
+      console.warn(`Рассылка fail ${u.chat_id}:`, e.message);
+    }
+    // небольшая пауза чтобы не словить rate limit Telegram
+    await new Promise(r => setTimeout(r, 50));
+  }
+
+  broadcastDraftText = null;
+  return ctx.reply(`✅ Рассылка завершена.\n📤 Отправлено: ${ok}\n❌ Ошибок: ${fail}`);
 });
 
-bot.action('post_pub_edit', async ctx => {
+bot.action('broadcast_edit', async ctx => {
   await ctx.answerCbQuery();
-  if (!lastChannelPost) return ctx.reply('❌ Нет поста для редактирования.');
-  postEditPublishedAwaiting = true;
-  return ctx.reply('✏️ Пришлите новый текст — он заменит пост на канале.\n/cancel_post — отмена');
+  broadcastAwaiting = true;
+  broadcastDraftText = null;
+  return ctx.reply('✏️ Пришлите новый текст рассылки.');
+});
+
+bot.action('broadcast_discard', async ctx => {
+  await ctx.answerCbQuery();
+  broadcastDraftText = null;
+  broadcastAwaiting = false;
+  return ctx.editMessageText('🗑 Рассылка отменена.');
 });
 
 bot.action('main_menu', ctx => {
