@@ -1,12 +1,13 @@
 {
-  "name": "uslugi-bot",
+  "name": "uslugi-uz-main-bot",
   "version": "1.0.0",
-  "engines": { "node": "24.x" },
-  "main": "bot.js",
-  "scripts": { "start": "node bot.js" },
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node main-bot.js"
+  },
+  "engines": { "node": ">=18" },
   "dependencies": {
-    "telegraf": "^4.16.3",
-    "node-fetch": "^3.3.2",
-    "ws": "^8.18.0"
+    "telegraf": "^4.16.3"
   }
 }
