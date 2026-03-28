@@ -18,6 +18,8 @@ async function sbFetch(path, opts={}) {
       ...(opts.headers||{})
     }
   });
+  // 204 No Content — успех для DELETE/PATCH без тела
+  if (res.status === 204) return null;
   if (!res.ok) { const e=await res.text(); throw new Error(`Supabase ${res.status}: ${e}`); }
   const t=await res.text(); return t?JSON.parse(t):null;
 }
@@ -25,7 +27,7 @@ async function sbFetch(path, opts={}) {
 const db = {
   select: (tbl,p='') => sbFetch(`/rest/v1/${tbl}?${p}`,{method:'GET',headers:{'Prefer':'return=representation'}}),
   update: (tbl,f,d)  => sbFetch(`/rest/v1/${tbl}?${f}`,{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(d)}),
-  delete: (tbl,f)    => sbFetch(`/rest/v1/${tbl}?${f}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}})
+  delete: (tbl,f)    => sbFetch(`/rest/v1/${tbl}?${f}`,{method:'DELETE'})
 };
 
 const BOT_TOKEN = process.env.BOT_TOKEN || '8626567698:AAHuhRM4wHuc4_HerFbem1mD_WXTHv6e9v8';
