@@ -35,15 +35,38 @@
   .service-card { background:white; border-radius:18px; overflow:hidden; display:flex; flex-direction:column; transition:transform 0.2s,box-shadow 0.2s; box-shadow:0 2px 10px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.04); cursor:pointer; }
   .service-card:active { transform:scale(0.97); }
 
-  /* Превью — закруглённый квадрат внутри карточки */
   .card-thumb { width:calc(100% - 24px); margin:12px auto 0; aspect-ratio:1; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; border-radius:16px; flex-shrink:0; }
   .card-thumb img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; position:absolute; inset:0; }
   .card-thumb .no-photo-emoji { font-size:2.8rem; line-height:1; position:relative; z-index:1; }
 
-  .service-card-content { padding:10px 12px 12px; flex:1; display:flex; flex-direction:column; gap:3px; }
-  .service-card h4 { font-weight:700; font-size:0.88rem; color:#1a1a1a; line-height:1.25; }
+  /* ✅ Синяя галочка верификации — как в инстаграм */
+  .verified-badge {
+    position:absolute; bottom:6px; right:6px;
+    width:22px; height:22px; z-index:5;
+    background:#1877f2;
+    border-radius:50%;
+    border:2px solid white;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 6px rgba(24,119,242,0.5);
+  }
+  .verified-badge svg { width:12px; height:12px; fill:white; }
 
-  /* Категория + специальность */
+  /* Галочка в профиле (побольше) */
+  .verified-badge-lg {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px; height:20px;
+    background:#1877f2;
+    border-radius:50%;
+    margin-left:5px;
+    vertical-align:middle;
+    box-shadow:0 2px 6px rgba(24,119,242,0.4);
+    flex-shrink:0;
+  }
+  .verified-badge-lg svg { width:11px; height:11px; fill:white; }
+
+  .service-card-content { padding:10px 12px 12px; flex:1; display:flex; flex-direction:column; gap:3px; }
+  .service-card h4 { font-weight:700; font-size:0.88rem; color:#1a1a1a; line-height:1.25; display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+
   .card-meta-row { display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-top:1px; }
   .cat-label { font-size:0.7rem; color:#aaa; font-weight:600; }
   .spec-label { font-size:0.7rem; color:#8B3E3A; font-weight:700; background:rgba(139,62,58,0.07); border-radius:6px; padding:2px 6px; }
@@ -96,6 +119,28 @@
   .spec-chip.other-chip { border-style:dashed; color:#aaa; }
   .spec-chip.other-chip.selected { background:#f0f0f0; border-color:#ccc; border-style:solid; color:#555; box-shadow:none; }
 
+  /* ✅ Стили для загрузки документа */
+  .doc-upload-area {
+    border:2px dashed #b8d4f8;
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    cursor:pointer;
+    transition:all 0.2s;
+    background:#f0f7ff;
+  }
+  .doc-upload-area:hover, .doc-upload-area.drag-over {
+    border-color:#1877f2;
+    background:#e6f0ff;
+  }
+  .doc-upload-area .doc-icon { font-size:2rem; margin-bottom:6px; }
+  .doc-upload-area .doc-hint { font-size:0.82rem; font-weight:600; color:#555; }
+  .doc-upload-area .doc-formats { font-size:0.72rem; color:#aaa; margin-top:3px; }
+  .doc-uploaded { display:flex; align-items:center; gap:10px; background:#e8f5e9; border-radius:10px; padding:10px 12px; margin-top:8px; }
+  .doc-uploaded .doc-name { font-size:0.8rem; font-weight:600; color:#2e7d32; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .doc-remove { background:none; border:none; color:#e74c3c; font-size:1.1rem; cursor:pointer; padding:0 4px; flex-shrink:0; }
+  .doc-verify-note { font-size:0.75rem; color:#1877f2; font-weight:600; margin-top:6px; display:flex; align-items:center; gap:4px; }
+
   /* PROFILE MODAL */
   #profile-modal .modal-content { max-height:92vh; }
   .profile-hero { position:relative; height:128px; background:#e8e8e8; overflow:visible; }
@@ -106,7 +151,7 @@
   .profile-avatar { width:100px; height:100px; border-radius:50%; border:4px solid #fff; display:flex; align-items:center; justify-content:center; font-size:2.5rem; position:absolute; bottom:-34px; left:20px; z-index:4; box-shadow:0 6px 24px rgba(0,0,0,0.22); overflow:hidden; background:#f5f5f5; }
   .profile-avatar img { width:100%; height:100%; object-fit:cover; object-position:top center; transform:translateZ(0); }
   .profile-body { padding:50px 20px 20px; }
-  .profile-name { font-size:1.3rem; font-weight:700; color:#1a1a1a; margin-bottom:2px; }
+  .profile-name { font-size:1.3rem; font-weight:700; color:#1a1a1a; margin-bottom:2px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
   .profile-spec { font-size:0.85rem; color:#8B3E3A; font-weight:700; margin-bottom:12px; }
   .profile-meta { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
   .profile-badge { background:#f5f5f5; border-radius:20px; padding:5px 12px; font-size:0.75rem; font-weight:700; color:#555; }
@@ -224,15 +269,42 @@
         </div>
         <div id="photo-status" style="font-size:0.78rem;color:#aaa;margin-top:5px;text-align:center;"></div>
       </div>
+
+      <!-- ✅ ПОЛЕ ДОКУМЕНТА — только для категории "Проф" -->
+      <div class="form-group" id="doc-group" style="display:none">
+        <label>
+          Документ подтверждения
+          <span style="color:#1877f2;font-weight:400;font-size:0.78rem;margin-left:4px;">(диплом, сертификат)</span>
+        </label>
+        <div id="doc-upload-area" class="doc-upload-area">
+          <div class="doc-icon">📄</div>
+          <div class="doc-hint">Прикрепите диплом или сертификат</div>
+          <div class="doc-formats">JPG, PNG, PDF до 10MB</div>
+          <input id="doc-input" type="file" accept="image/*,.pdf,.doc,.docx" style="display:none" />
+        </div>
+        <div id="doc-uploaded" class="doc-uploaded" style="display:none">
+          <span style="font-size:1.3rem;">📎</span>
+          <span class="doc-name" id="doc-name">документ.pdf</span>
+          <button class="doc-remove" id="doc-remove" type="button">✕</button>
+        </div>
+        <div id="doc-status" style="font-size:0.78rem;color:#aaa;margin-top:5px;text-align:center;"></div>
+        <div class="doc-verify-note">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="#1877f2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#1877f2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          При одобрении получите синюю галочку верификации
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Способ связи <span class="required">*</span> <span style="color:#aaa;font-weight:400">(хотя бы один)</span></label>
         <div class="contact-row">
           <div class="contact-option">
             <span class="prefix">📞</span>
-            <input id="phone" type="tel" placeholder="+998 XX XXX XX XX" />
+            <!-- ✅ Подсказка с кодом страны и скобками оператора -->
+            <input id="phone" type="tel" placeholder="+998 (XX) XXX-XX-XX" />
           </div>
           <div class="contact-option">
-            <span class="prefix">✈️</span>
+            <span class="prefix" style="font-size:0.95rem;font-weight:700;color:#555;font-family:'Montserrat',sans-serif;left:13px;">@</span>
+            <!-- ✅ Подсказка с @, но сам символ не дублируется в значении -->
             <input id="telegram" type="text" placeholder="username" autocomplete="username" />
           </div>
         </div>
@@ -285,6 +357,19 @@ async function uploadPhoto(file) {
   return `${SUPABASE_URL}/storage/v1/object/public/photos/${path}`;
 }
 
+// ✅ Загрузка документа — отдельный бакет "documents"
+async function uploadDocument(file) {
+  const ext=file.name.split('.').pop()||'pdf';
+  const path=`public/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/documents/${path}`,{
+    method:'POST',
+    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},
+    body:file
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  return `${SUPABASE_URL}/storage/v1/object/public/documents/${path}`;
+}
+
 let services=[], currentCategory='';
 const CAT_EMOJI={'Быт':'🏠','Проф':'📄','Диджитал':'💻'};
 const CAT_BG={'Быт':'#FFF3E0','Проф':'#E8F5E9','Диджитал':'#E3F2FD'};
@@ -296,6 +381,9 @@ function toast(msg,color='#28a745'){
   document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
 }
 function decl(n){const m=n%10,h=n%100;if(m===1&&h!==11)return'отзыв';if([2,3,4].includes(m)&&![12,13,14].includes(h))return'отзыва';return'отзывов';}
+
+// ✅ SVG синяя галочка (inline, как в инстаграм)
+const VERIFIED_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 // Photo UI
 let uploadedPhotoUrl='';
@@ -325,6 +413,49 @@ async function handlePhoto(file){
     console.error(e);
     uploadedPhotoUrl=document.getElementById('preview-img').src;
     photoStatus.textContent='⚠️ Сохранено локально';photoStatus.style.color='#e67e22';
+  }
+}
+
+// ✅ Document UI
+let uploadedDocUrl = '';
+const docArea = document.getElementById('doc-upload-area');
+const docInput = document.getElementById('doc-input');
+const docStatus = document.getElementById('doc-status');
+const docUploaded = document.getElementById('doc-uploaded');
+
+docArea.addEventListener('click', () => docInput.click());
+docArea.addEventListener('dragover', e => { e.preventDefault(); docArea.classList.add('drag-over'); });
+docArea.addEventListener('dragleave', () => docArea.classList.remove('drag-over'));
+docArea.addEventListener('drop', e => {
+  e.preventDefault(); docArea.classList.remove('drag-over');
+  if(e.dataTransfer.files[0]) handleDocument(e.dataTransfer.files[0]);
+});
+docInput.addEventListener('change', e => { if(e.target.files[0]) handleDocument(e.target.files[0]); });
+document.getElementById('doc-remove').addEventListener('click', () => {
+  uploadedDocUrl = '';
+  docInput.value = '';
+  docUploaded.style.display = 'none';
+  docArea.style.display = 'block';
+  docStatus.textContent = '';
+});
+
+async function handleDocument(file) {
+  if(file.size > 10*1024*1024) {
+    docStatus.textContent='❌ Файл слишком большой (макс 10MB)';
+    docStatus.style.color='#e74c3c';
+    return;
+  }
+  docStatus.textContent='⏳ Загрузка документа...'; docStatus.style.color='#aaa';
+  try {
+    uploadedDocUrl = await uploadDocument(file);
+    document.getElementById('doc-name').textContent = file.name;
+    docUploaded.style.display = 'flex';
+    docArea.style.display = 'none';
+    docStatus.textContent = '✅ Документ загружен!'; docStatus.style.color='#28a745';
+  } catch(e) {
+    console.error(e);
+    docStatus.textContent='❌ Ошибка загрузки: '+(e.message||'');
+    docStatus.style.color='#e74c3c';
   }
 }
 
@@ -365,7 +496,21 @@ function renderSpecialtyChips(cat){
     });
   });
 }
-document.getElementById('category').addEventListener('change',function(){renderSpecialtyChips(this.value);});
+
+// ✅ При смене категории — показываем/скрываем поле документа
+document.getElementById('category').addEventListener('change',function(){
+  renderSpecialtyChips(this.value);
+  const docGroup = document.getElementById('doc-group');
+  docGroup.style.display = this.value === 'Проф' ? 'block' : 'none';
+  // Сбрасываем документ при смене категории
+  if(this.value !== 'Проф') {
+    uploadedDocUrl = '';
+    docInput.value = '';
+    docUploaded.style.display = 'none';
+    docArea.style.display = 'block';
+    docStatus.textContent = '';
+  }
+});
 
 document.querySelectorAll('.category-btn').forEach(btn=>{
   btn.addEventListener('click',function(){
@@ -403,16 +548,20 @@ function renderServices(){
   cont.innerHTML=filtered.map(s=>{
     const emoji=CAT_EMOJI[s.category]||'📦',bg=CAT_BG[s.category]||'#F5F5F5';
     const avg=s.rating_avg||0,cnt=s.rating_count||0;
-    // Thumb: фото — полная заливка, нет фото — цветной фон с эмодзи
     const thumb=s.photo_url
       ?`<img src="${esc(s.photo_url)}" onerror="this.style.display='none'">`
       :`<span class="no-photo-emoji">${emoji}</span>`;
+    // ✅ Синяя галочка на карточке
+    const verifiedBadge = s.verified
+      ? `<div class="verified-badge" title="Верифицированный специалист">${VERIFIED_SVG}</div>`
+      : '';
     return `<div class="service-card" data-id="${esc(String(s.id))}">
       <div class="card-thumb" style="${s.photo_url?'':'background:'+bg}">
         ${thumb}
+        ${verifiedBadge}
       </div>
       <div class="service-card-content">
-        <h4>${esc(s.name)}</h4>
+        <h4>${esc(s.name)}${s.verified ? `<span class="verified-badge-lg" title="Верифицирован">${VERIFIED_SVG}</span>` : ''}</h4>
         <div class="card-meta-row">
           <span class="cat-label">${emoji} ${esc(s.category)}</span>
           ${s.specialty?`<span class="spec-label">${esc(s.specialty)}</span>`:''}
@@ -447,17 +596,23 @@ async function openProfile(s){
     ?`<img src="${esc(s.photo_url)}" onerror="this.style.display='none'">`
     :emoji;
 
+  // ✅ Синяя галочка в имени профиля
+  const verifiedTag = s.verified
+    ? `<span class="verified-badge-lg" title="Верифицированный специалист">${VERIFIED_SVG}</span>`
+    : '';
+
   document.getElementById('profile-body').innerHTML=`
     <div class="profile-hero" style="${s.photo_url?'':'background:'+bg}">
       <div class="profile-hero-bg">${heroHtml}</div>
       <div class="profile-avatar">${avatarHtml}</div>
     </div>
     <div class="profile-body">
-      <div class="profile-name">${esc(s.name)}</div>
+      <div class="profile-name">${esc(s.name)}${verifiedTag}</div>
       <div class="profile-spec">${s.specialty?`🎯 ${esc(s.specialty)}`:`📂 ${esc(s.category)}`}</div>
       <div class="profile-meta">
         <span class="profile-badge">${emoji} ${esc(s.category)}</span>
         ${avg>0?`<span class="profile-badge">⭐ ${avg.toFixed(1)} (${cnt})</span>`:'<span class="profile-badge">☆ Нет оценок</span>'}
+        ${s.verified?`<span class="profile-badge" style="background:#e8f0fe;color:#1877f2;">✔ Верифицирован</span>`:''}
       </div>
       ${s.description?`<div class="profile-desc">${esc(s.description)}</div>`:''}
       <div class="profile-contacts">
@@ -541,6 +696,7 @@ document.getElementById('submit-btn').addEventListener('click',async function(){
   const desc=document.getElementById('desc').value.trim();
   const phone=document.getElementById('phone').value.trim();
   const telegramRaw=document.getElementById('telegram').value.trim();
+  // ✅ Убираем @ если пользователь всё же написал его сам
   const telegram=telegramRaw.replace(/^@+/,'').trim();
   const customVal=document.getElementById('specialty-custom').value.trim();
   const specialty=selectedSpecialty==='__custom__'?customVal:selectedSpecialty;
@@ -551,7 +707,20 @@ document.getElementById('submit-btn').addEventListener('click',async function(){
 
   this.disabled=true;this.innerHTML='<span class="loading-spinner"></span> Отправка...';
   try{
-    await db.insert('services',{name,category,specialty:specialty||'',description:desc||null,phone:phone||null,telegram:telegram||null,status:'pending',photo_url:uploadedPhotoUrl||null,rating_avg:0,rating_count:0});
+    await db.insert('services',{
+      name,
+      category,
+      specialty:specialty||'',
+      description:desc||null,
+      phone:phone||null,
+      telegram:telegram||null,
+      status:'pending',
+      photo_url:uploadedPhotoUrl||null,
+      // ✅ Передаём URL документа (только для Проф)
+      document_url: category === 'Проф' ? (uploadedDocUrl || null) : null,
+      rating_avg:0,
+      rating_count:0
+    });
     ['name','desc','phone','telegram','specialty-custom'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('category').value='';
     selectedSpecialty='';renderSpecialtyChips('');
@@ -559,6 +728,11 @@ document.getElementById('submit-btn').addEventListener('click',async function(){
     document.getElementById('photo-preview').style.display='none';
     document.getElementById('photo-placeholder').style.display='block';
     photoInput.value='';
+    // Сбрасываем документ
+    uploadedDocUrl='';docInput.value='';
+    docUploaded.style.display='none';docArea.style.display='block';
+    docStatus.textContent='';
+    document.getElementById('doc-group').style.display='none';
     closeModal();toast('✅ Заявка отправлена! Ожидайте проверки.');
   }catch(e){console.error(e);alert('❌ Ошибка: '+(e.message||'Не удалось отправить'));}
   finally{this.disabled=false;this.innerHTML='✅ Добавить услугу';}
