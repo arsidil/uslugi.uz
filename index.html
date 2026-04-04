@@ -31,50 +31,42 @@
   .services h3 { font-size:1.1rem; font-weight:700; color:#1a1a1a; margin-bottom:14px; }
   .services-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 
-  /* КАРТОЧКА */
   .service-card { background:white; border-radius:18px; overflow:hidden; display:flex; flex-direction:column; transition:transform 0.2s,box-shadow 0.2s; box-shadow:0 2px 10px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.04); cursor:pointer; }
   .service-card:active { transform:scale(0.97); }
-
   .card-thumb { width:calc(100% - 24px); margin:12px auto 0; aspect-ratio:1; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; border-radius:16px; flex-shrink:0; }
   .card-thumb img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; position:absolute; inset:0; }
   .card-thumb .no-photo-emoji { font-size:2.8rem; line-height:1; position:relative; z-index:1; }
 
-  /* ✅ Синяя галочка верификации — как в инстаграм */
+  /* ✅ Синяя галочка на превью карточки */
   .verified-badge {
-    position:absolute; bottom:6px; right:6px;
-    width:22px; height:22px; z-index:5;
-    background:#1877f2;
-    border-radius:50%;
-    border:2px solid white;
+    position:absolute; bottom:7px; right:7px; z-index:5;
+    width:26px; height:26px;
+    background:#1877f2; border-radius:50%;
+    border:2.5px solid white;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 2px 6px rgba(24,119,242,0.5);
+    box-shadow:0 2px 8px rgba(24,119,242,0.6);
   }
-  .verified-badge svg { width:12px; height:12px; fill:white; }
+  .verified-badge svg { width:15px; height:15px; }
 
-  /* Галочка в профиле (побольше) */
+  /* Галочка в имени (inline) */
   .verified-badge-lg {
     display:inline-flex; align-items:center; justify-content:center;
-    width:20px; height:20px;
-    background:#1877f2;
-    border-radius:50%;
-    margin-left:5px;
-    vertical-align:middle;
-    box-shadow:0 2px 6px rgba(24,119,242,0.4);
+    width:22px; height:22px;
+    background:#1877f2; border-radius:50%;
+    margin-left:4px; vertical-align:middle;
+    box-shadow:0 2px 8px rgba(24,119,242,0.45);
     flex-shrink:0;
   }
-  .verified-badge-lg svg { width:11px; height:11px; fill:white; }
+  .verified-badge-lg svg { width:13px; height:13px; }
 
   .service-card-content { padding:10px 12px 12px; flex:1; display:flex; flex-direction:column; gap:3px; }
   .service-card h4 { font-weight:700; font-size:0.88rem; color:#1a1a1a; line-height:1.25; display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
-
   .card-meta-row { display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-top:1px; }
   .cat-label { font-size:0.7rem; color:#aaa; font-weight:600; }
   .spec-label { font-size:0.7rem; color:#8B3E3A; font-weight:700; background:rgba(139,62,58,0.07); border-radius:6px; padding:2px 6px; }
-
   .card-rating { display:flex; align-items:center; gap:4px; margin:4px 0; }
   .card-rating .stars { font-size:0.72rem; }
   .card-rating .count { font-size:0.68rem; color:#aaa; font-weight:600; }
-
   .service-card .desc { font-size:0.77rem; color:#777; flex:1; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height:1.4; }
 
   .call-btn { background:linear-gradient(135deg,#8B3E3A,#A64844); color:white; border:none; border-radius:10px; padding:9px 10px; font-size:0.78rem; font-weight:700; font-family:'Montserrat',sans-serif; cursor:pointer; display:block; text-align:center; transition:all 0.2s; width:100%; box-shadow:0 4px 12px rgba(139,62,58,0.35),inset 0 1px 0 rgba(255,255,255,0.15); }
@@ -89,6 +81,7 @@
 
   .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.65); z-index:50; display:flex; align-items:flex-end; justify-content:center; visibility:hidden; opacity:0; transition:opacity 0.3s,visibility 0.3s; backdrop-filter:blur(3px); }
   #profile-modal.modal-overlay { backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(0,0,0,0.55); }
+  #policy-modal.modal-overlay { z-index:60; }
   .modal-overlay.active { visibility:visible; opacity:1; }
   .modal-content { background:#fefefe; border-radius:24px 24px 0 0; width:100%; max-height:95vh; overflow-y:auto; max-width:500px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1); box-shadow:0 -8px 40px rgba(0,0,0,0.2); }
   .modal-overlay.active .modal-content { transform:translateY(0); }
@@ -119,32 +112,43 @@
   .spec-chip.other-chip { border-style:dashed; color:#aaa; }
   .spec-chip.other-chip.selected { background:#f0f0f0; border-color:#ccc; border-style:solid; color:#555; box-shadow:none; }
 
-  /* ✅ Стили для загрузки документа */
-  .doc-upload-area {
-    border:2px dashed #b8d4f8;
-    border-radius:12px;
-    padding:16px;
-    text-align:center;
-    cursor:pointer;
-    transition:all 0.2s;
-    background:#f0f7ff;
-  }
-  .doc-upload-area:hover, .doc-upload-area.drag-over {
-    border-color:#1877f2;
-    background:#e6f0ff;
-  }
-  .doc-upload-area .doc-icon { font-size:2rem; margin-bottom:6px; }
-  .doc-upload-area .doc-hint { font-size:0.82rem; font-weight:600; color:#555; }
-  .doc-upload-area .doc-formats { font-size:0.72rem; color:#aaa; margin-top:3px; }
+  /* Загрузка документов */
+  .doc-upload-area { border:2px dashed #b8d4f8; border-radius:12px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f0f7ff; }
+  .doc-upload-area:hover,.doc-upload-area.drag-over { border-color:#1877f2; background:#e6f0ff; }
+  .passport-upload-area { border:2px dashed #c4b5fd; border-radius:12px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f8f5ff; }
+  .passport-upload-area:hover,.passport-upload-area.drag-over { border-color:#7c3aed; background:#ede9fe; }
+  .doc-upload-area .doc-icon,.passport-upload-area .doc-icon { font-size:2rem; margin-bottom:6px; }
+  .doc-upload-area .doc-hint,.passport-upload-area .doc-hint { font-size:0.82rem; font-weight:600; color:#555; }
+  .doc-upload-area .doc-formats,.passport-upload-area .doc-formats { font-size:0.72rem; color:#aaa; margin-top:3px; }
   .doc-uploaded { display:flex; align-items:center; gap:10px; background:#e8f5e9; border-radius:10px; padding:10px 12px; margin-top:8px; }
+  .passport-uploaded { display:flex; align-items:center; gap:10px; background:#ede9fe; border-radius:10px; padding:10px 12px; margin-top:8px; }
   .doc-uploaded .doc-name { font-size:0.8rem; font-weight:600; color:#2e7d32; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .passport-uploaded .doc-name { font-size:0.8rem; font-weight:600; color:#5b21b6; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .doc-remove { background:none; border:none; color:#e74c3c; font-size:1.1rem; cursor:pointer; padding:0 4px; flex-shrink:0; }
-  .doc-verify-note { font-size:0.75rem; color:#1877f2; font-weight:600; margin-top:6px; display:flex; align-items:center; gap:4px; }
+  .doc-verify-note { font-size:0.75rem; color:#1877f2; font-weight:600; margin-top:6px; display:flex; align-items:center; gap:5px; }
+  .passport-note { font-size:0.73rem; color:#6d28d9; font-weight:600; margin-top:8px; display:flex; align-items:flex-start; gap:6px; background:#f5f0ff; border-radius:8px; padding:8px 10px; line-height:1.5; }
+  .passport-note svg { flex-shrink:0; margin-top:1px; }
 
-  /* PROFILE MODAL */
+  /* Соглашение */
+  .privacy-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:14px; }
+  .privacy-check-wrap { width:20px; min-width:20px; height:20px; margin-top:1px; display:flex; align-items:center; justify-content:center; }
+  .privacy-check-wrap input[type=checkbox] { width:18px; height:18px; border:2px solid #ccc; border-radius:5px; cursor:pointer; accent-color:#8B3E3A; padding:0; -webkit-user-select:none; user-select:none; }
+  .privacy-text { font-size:0.78rem; color:#666; line-height:1.55; -webkit-user-select:none; user-select:none; }
+  .privacy-text a { color:#8B3E3A; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(139,62,58,0.35); cursor:pointer; }
+
+  /* Policy modal */
+  #policy-modal .modal-content { max-height:90vh; }
+  #policy-modal .modal-body { -webkit-user-select:text; user-select:text; }
+  .policy-text h3 { font-size:0.92rem; font-weight:700; color:#1a1a1a; margin:16px 0 5px; }
+  .policy-text p,.policy-text li { font-size:0.82rem; color:#555; line-height:1.65; }
+  .policy-text ul { padding-left:18px; margin-top:4px; }
+  .policy-text li { margin-bottom:3px; }
+  .policy-close-btn { background:linear-gradient(135deg,#8B3E3A,#A64844); color:white; border:none; padding:13px 20px; border-radius:12px; font-weight:700; font-size:0.95rem; font-family:'Montserrat',sans-serif; cursor:pointer; width:100%; margin-top:20px; }
+
+  /* Profile modal */
   #profile-modal .modal-content { max-height:92vh; }
   .profile-hero { position:relative; height:128px; background:#e8e8e8; overflow:visible; }
-  .profile-hero-bg { position:absolute; inset:0; overflow:hidden; border-radius:0; }
+  .profile-hero-bg { position:absolute; inset:0; overflow:hidden; }
   .profile-hero-img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; transform:translateZ(0); }
   .profile-hero-emoji { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:4rem; }
   .profile-hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.06) 0%,rgba(255,255,255,0.95) 88%); pointer-events:none; }
@@ -158,7 +162,6 @@
   .profile-desc { font-size:0.88rem; color:#555; line-height:1.6; margin-bottom:18px; }
   .profile-contacts { display:flex; gap:8px; margin-bottom:20px; }
   .profile-contacts .call-btn,.profile-contacts .tg-btn { flex:1; margin-top:0; }
-
   .rating-section { border-top:1px solid #f0f0f0; padding-top:18px; margin-bottom:18px; }
   .rating-section h4 { font-size:1rem; font-weight:700; color:#1a1a1a; margin-bottom:12px; }
   .rating-summary { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
@@ -166,7 +169,6 @@
   .rating-right { display:flex; flex-direction:column; gap:4px; }
   .rating-stars-big { font-size:1.3rem; letter-spacing:2px; }
   .rating-count { font-size:0.78rem; color:#aaa; font-weight:600; }
-
   .star-picker { display:flex; gap:6px; margin-bottom:12px; }
   .star-btn { font-size:1.8rem; cursor:pointer; opacity:0.3; transition:all 0.15s; background:none; border:none; padding:0; line-height:1; }
   .star-btn.active { opacity:1; transform:scale(1.1); }
@@ -175,7 +177,6 @@
   .btn-review { background:linear-gradient(135deg,#8B3E3A,#A64844); color:white; border:none; padding:11px 20px; border-radius:12px; font-weight:700; font-size:0.88rem; font-family:'Montserrat',sans-serif; cursor:pointer; width:100%; margin-top:10px; box-shadow:0 4px 14px rgba(139,62,58,0.3); transition:all 0.2s; }
   .btn-review:active { transform:scale(0.97); }
   .btn-review:disabled { opacity:0.5; cursor:not-allowed; }
-
   .reviews-list { display:flex; flex-direction:column; gap:12px; margin-top:16px; }
   .review-item { background:#fafafa; border-radius:14px; padding:12px 14px; border:1px solid #f0f0f0; }
   .review-item-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
@@ -232,10 +233,12 @@
       <button id="close-modal-btn">✕</button>
     </div>
     <div class="modal-body">
+
       <div class="form-group">
         <label>Ваше имя <span class="required">*</span></label>
         <input id="name" type="text" placeholder="Как вас зовут?" />
       </div>
+
       <div class="form-group">
         <label>Категория <span class="required">*</span></label>
         <select id="category">
@@ -245,15 +248,18 @@
           <option value="Диджитал">💻 Диджитал</option>
         </select>
       </div>
+
       <div class="form-group" id="specialty-group" style="display:none">
         <label>Специальность / Услуга <span class="required">*</span></label>
         <div class="specialty-chips" id="specialty-chips"></div>
         <input id="specialty-custom" type="text" placeholder="Введите свою специальность..." style="display:none;margin-top:10px" />
       </div>
+
       <div class="form-group">
         <label>Описание услуги</label>
         <textarea id="desc" placeholder="Что вы предлагаете? Опыт, специализация..."></textarea>
       </div>
+
       <div class="form-group">
         <label>Фото профиля</label>
         <div id="photo-upload-area" style="border:2px dashed #e8e8e8;border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafafa;">
@@ -270,11 +276,35 @@
         <div id="photo-status" style="font-size:0.78rem;color:#aaa;margin-top:5px;text-align:center;"></div>
       </div>
 
-      <!-- ✅ ПОЛЕ ДОКУМЕНТА — только для категории "Проф" -->
+      <!-- Паспорт/ID — для всех категорий -->
+      <div class="form-group">
+        <label>
+          Паспорт или ID-карта
+          <span style="color:#7c3aed;font-weight:400;font-size:0.78rem;margin-left:4px;">(для верификации)</span>
+        </label>
+        <div id="passport-upload-area" class="passport-upload-area">
+          <div class="doc-icon">🪪</div>
+          <div class="doc-hint">Загрузите фото паспорта или ID-карты</div>
+          <div class="doc-formats">JPG, PNG, PDF до 10MB</div>
+          <input id="passport-input" type="file" accept="image/*,.pdf" style="display:none" />
+        </div>
+        <div id="passport-uploaded" class="passport-uploaded" style="display:none">
+          <span style="font-size:1.3rem;">🪪</span>
+          <span class="doc-name" id="passport-name">документ</span>
+          <button class="doc-remove" id="passport-remove" type="button">✕</button>
+        </div>
+        <div id="passport-status" style="font-size:0.78rem;color:#aaa;margin-top:5px;text-align:center;"></div>
+        <div class="passport-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round"/></svg>
+          Виден только администратору, не публикуется. Нужен для получения синей галочки верификации.
+        </div>
+      </div>
+
+      <!-- Диплом/сертификат — только для категории "Проф" -->
       <div class="form-group" id="doc-group" style="display:none">
         <label>
-          Документ подтверждения
-          <span style="color:#1877f2;font-weight:400;font-size:0.78rem;margin-left:4px;">(диплом, сертификат)</span>
+          Диплом или сертификат
+          <span style="color:#1877f2;font-weight:400;font-size:0.78rem;margin-left:4px;">(только для Проф)</span>
         </label>
         <div id="doc-upload-area" class="doc-upload-area">
           <div class="doc-icon">📄</div>
@@ -289,8 +319,8 @@
         </div>
         <div id="doc-status" style="font-size:0.78rem;color:#aaa;margin-top:5px;text-align:center;"></div>
         <div class="doc-verify-note">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="#1877f2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#1877f2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          При одобрении получите синюю галочку верификации
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#1877f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Для Проф нужны и паспорт, и диплом — тогда профиль получит галочку верификации
         </div>
       </div>
 
@@ -299,17 +329,28 @@
         <div class="contact-row">
           <div class="contact-option">
             <span class="prefix">📞</span>
-            <!-- ✅ Подсказка с кодом страны и скобками оператора -->
             <input id="phone" type="tel" placeholder="+998 (XX) XXX-XX-XX" />
           </div>
           <div class="contact-option">
             <span class="prefix" style="font-size:0.95rem;font-weight:700;color:#555;font-family:'Montserrat',sans-serif;left:13px;">@</span>
-            <!-- ✅ Подсказка с @, но сам символ не дублируется в значении -->
             <input id="telegram" type="text" placeholder="username" autocomplete="username" />
           </div>
         </div>
         <p class="form-hint">Укажите телефон и/или Telegram-юзернейм</p>
       </div>
+
+      <!-- Соглашение с политикой -->
+      <div class="privacy-row">
+        <div class="privacy-check-wrap">
+          <input type="checkbox" id="privacy-check" />
+        </div>
+        <div class="privacy-text">
+          Я ознакомлен и соглашаюсь с
+          <a id="policy-link">Политикой конфиденциальности</a>
+          и <a id="terms-link">Пользовательским соглашением</a> сервиса Uslugi.uz
+        </div>
+      </div>
+
       <button id="submit-btn" class="btn-submit">✅ Добавить услугу</button>
       <button id="cancel-btn" class="btn-cancel">Отмена</button>
     </div>
@@ -327,6 +368,53 @@
   </div>
 </div>
 
+<!-- POLICY MODAL -->
+<div id="policy-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📄 Политика конфиденциальности</h2>
+      <button id="close-policy-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="policy-text">
+        <p style="font-size:0.79rem;color:#aaa;margin-bottom:10px;">Разработана в соответствии с законодательством Республики Узбекистан, включая Закон «О персональных данных».</p>
+        <h3>1. Сбор данных</h3>
+        <p>Сервис может собирать:</p>
+        <ul>
+          <li>ФИО, контактные данные (телефон)</li>
+          <li>Паспортные данные и документы, загружаемые добровольно</li>
+          <li>Фотографии, сертификаты, лицензии</li>
+        </ul>
+        <h3>2. Цели обработки</h3>
+        <ul>
+          <li>Идентификация и верификация пользователя</li>
+          <li>Обеспечение функционирования сервиса</li>
+          <li>Повышение доверия между пользователями</li>
+          <li>Соблюдение законодательства Республики Узбекистан</li>
+        </ul>
+        <h3>3. Хранение и защита</h3>
+        <ul>
+          <li>Данные хранятся в защищённой базе данных</li>
+          <li><strong>Не публикуются в открытом доступе</strong></li>
+          <li>Не передаются третьим лицам без вашего согласия</li>
+        </ul>
+        <h3>4. Передача данных</h3>
+        <p>Возможна только по запросу уполномоченных госорганов или с согласия пользователя.</p>
+        <h3>5. Права пользователя</h3>
+        <ul>
+          <li>Запросить информацию о своих данных</li>
+          <li>Потребовать уточнения, блокировки или удаления</li>
+          <li>Отозвать согласие на обработку</li>
+        </ul>
+        <h3>6. Изменения</h3>
+        <p>Администрация вправе вносить изменения. Актуальная версия всегда доступна в интерфейсе сервиса.</p>
+        <p style="margin-top:14px;font-size:0.77rem;color:#aaa;line-height:1.55;">Нажимая «Добавить услугу», вы подтверждаете, что ознакомлены и соглашаетесь с условиями настоящей Политики конфиденциальности и Пользовательского соглашения сервиса Uslugi.uz.</p>
+      </div>
+      <button class="policy-close-btn" id="policy-close-bottom">Понятно ✓</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL  = 'https://sqsbqsizbzcddbzbaigw.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxc2Jxc2l6YnpjZGRiemJhaWd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDU5MjgsImV4cCI6MjA4OTY4MTkyOH0.4K3aFA-d1NkXfw8PfshW-CphdzzSFHEZ9qiKASZN9sA';
@@ -334,58 +422,41 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 async function sbFetch(path, opts={}) {
   const res = await fetch(`${SUPABASE_URL}${path}`, {
     ...opts,
-    headers: { 'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Content-Type':'application/json',...(opts.headers||{}) }
+    headers: {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Content-Type':'application/json',...(opts.headers||{})}
   });
   if (!res.ok) { const e=await res.text(); throw new Error(e); }
   const t=await res.text(); return t?JSON.parse(t):null;
 }
 const db = {
-  select: (tbl,p='') => sbFetch(`/rest/v1/${tbl}?${p}`,{method:'GET',headers:{'Prefer':'return=representation'}}),
-  insert: (tbl,row)  => sbFetch(`/rest/v1/${tbl}`,{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),
-  update: (tbl,f,d)  => sbFetch(`/rest/v1/${tbl}?${f}`,{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(d)})
+  select:(tbl,p='') => sbFetch(`/rest/v1/${tbl}?${p}`,{method:'GET',headers:{'Prefer':'return=representation'}}),
+  insert:(tbl,row)  => sbFetch(`/rest/v1/${tbl}`,{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),
+  update:(tbl,f,d)  => sbFetch(`/rest/v1/${tbl}?${f}`,{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(d)})
 };
 
-async function uploadPhoto(file) {
+async function uploadToStorage(bucket, file) {
   const ext=file.name.split('.').pop()||'jpg';
   const path=`public/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/photos/${path}`,{
+  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`,{
     method:'POST',
     headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},
     body:file
   });
   if(!res.ok){const e=await res.text();throw new Error(e);}
-  return `${SUPABASE_URL}/storage/v1/object/public/photos/${path}`;
-}
-
-// ✅ Загрузка документа — отдельный бакет "documents"
-async function uploadDocument(file) {
-  const ext=file.name.split('.').pop()||'pdf';
-  const path=`public/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/documents/${path}`,{
-    method:'POST',
-    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},
-    body:file
-  });
-  if(!res.ok){const e=await res.text();throw new Error(e);}
-  return `${SUPABASE_URL}/storage/v1/object/public/documents/${path}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
 
 let services=[], currentCategory='';
 const CAT_EMOJI={'Быт':'🏠','Проф':'📄','Диджитал':'💻'};
 const CAT_BG={'Быт':'#FFF3E0','Проф':'#E8F5E9','Диджитал':'#E3F2FD'};
-
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function stars(r,m=5){let s='';for(let i=1;i<=m;i++)s+=i<=Math.round(r)?'⭐':'☆';return s;}
-function toast(msg,color='#28a745'){
-  const t=document.createElement('div');t.className='success-message';t.style.background=color;t.textContent=msg;
-  document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
-}
+function toast(msg,color='#28a745'){const t=document.createElement('div');t.className='success-message';t.style.background=color;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 function decl(n){const m=n%10,h=n%100;if(m===1&&h!==11)return'отзыв';if([2,3,4].includes(m)&&![12,13,14].includes(h))return'отзыва';return'отзывов';}
 
-// ✅ SVG синяя галочка (inline, как в инстаграм)
-const VERIFIED_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// ✅ Галочка — polyline даёт чёткую птичку, чуть крупнее внутри круга
+const VERIFIED_SVG=`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="4,13 9,18 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-// Photo UI
+// ── Photo ─────────────────────────────────────────────────────────────────────
 let uploadedPhotoUrl='';
 const photoArea=document.getElementById('photo-upload-area');
 const photoInput=document.getElementById('photo-input');
@@ -395,71 +466,67 @@ photoArea.addEventListener('dragover',e=>{e.preventDefault();photoArea.style.bor
 photoArea.addEventListener('dragleave',()=>photoArea.style.borderColor='#e8e8e8');
 photoArea.addEventListener('drop',e=>{e.preventDefault();photoArea.style.borderColor='#e8e8e8';if(e.dataTransfer.files[0])handlePhoto(e.dataTransfer.files[0]);});
 photoInput.addEventListener('change',e=>{if(e.target.files[0])handlePhoto(e.target.files[0]);});
-
 async function handlePhoto(file){
   if(file.size>5*1024*1024){photoStatus.textContent='❌ Файл слишком большой (макс 5MB)';photoStatus.style.color='#e74c3c';return;}
   photoStatus.textContent='⏳ Загрузка...';photoStatus.style.color='#aaa';
   const reader=new FileReader();
-  reader.onload=ev=>{
-    document.getElementById('preview-img').src=ev.target.result;
-    document.getElementById('photo-preview').style.display='block';
-    document.getElementById('photo-placeholder').style.display='none';
-  };
+  reader.onload=ev=>{document.getElementById('preview-img').src=ev.target.result;document.getElementById('photo-preview').style.display='block';document.getElementById('photo-placeholder').style.display='none';};
   reader.readAsDataURL(file);
+  try{uploadedPhotoUrl=await uploadToStorage('photos',file);photoStatus.textContent='✅ Фото загружено!';photoStatus.style.color='#28a745';}
+  catch(e){console.error(e);uploadedPhotoUrl=document.getElementById('preview-img').src;photoStatus.textContent='⚠️ Сохранено локально';photoStatus.style.color='#e67e22';}
+}
+
+// ── Passport ──────────────────────────────────────────────────────────────────
+let uploadedPassportUrl='';
+const passportArea=document.getElementById('passport-upload-area');
+const passportInput=document.getElementById('passport-input');
+const passportStatus=document.getElementById('passport-status');
+const passportUploaded=document.getElementById('passport-uploaded');
+passportArea.addEventListener('click',()=>passportInput.click());
+passportArea.addEventListener('dragover',e=>{e.preventDefault();passportArea.classList.add('drag-over');});
+passportArea.addEventListener('dragleave',()=>passportArea.classList.remove('drag-over'));
+passportArea.addEventListener('drop',e=>{e.preventDefault();passportArea.classList.remove('drag-over');if(e.dataTransfer.files[0])handlePassport(e.dataTransfer.files[0]);});
+passportInput.addEventListener('change',e=>{if(e.target.files[0])handlePassport(e.target.files[0]);});
+document.getElementById('passport-remove').addEventListener('click',()=>{
+  uploadedPassportUrl='';passportInput.value='';passportUploaded.style.display='none';passportArea.style.display='block';passportStatus.textContent='';
+});
+async function handlePassport(file){
+  if(file.size>10*1024*1024){passportStatus.textContent='❌ Файл слишком большой (макс 10MB)';passportStatus.style.color='#e74c3c';return;}
+  passportStatus.textContent='⏳ Загрузка...';passportStatus.style.color='#aaa';
   try{
-    uploadedPhotoUrl=await uploadPhoto(file);
-    photoStatus.textContent='✅ Фото загружено!';photoStatus.style.color='#28a745';
-  }catch(e){
-    console.error(e);
-    uploadedPhotoUrl=document.getElementById('preview-img').src;
-    photoStatus.textContent='⚠️ Сохранено локально';photoStatus.style.color='#e67e22';
-  }
+    uploadedPassportUrl=await uploadToStorage('documents',file);
+    document.getElementById('passport-name').textContent=file.name;
+    passportUploaded.style.display='flex';passportArea.style.display='none';
+    passportStatus.textContent='✅ Загружен!';passportStatus.style.color='#28a745';
+  }catch(e){console.error(e);passportStatus.textContent='❌ Ошибка: '+(e.message||'');passportStatus.style.color='#e74c3c';}
 }
 
-// ✅ Document UI
-let uploadedDocUrl = '';
-const docArea = document.getElementById('doc-upload-area');
-const docInput = document.getElementById('doc-input');
-const docStatus = document.getElementById('doc-status');
-const docUploaded = document.getElementById('doc-uploaded');
-
-docArea.addEventListener('click', () => docInput.click());
-docArea.addEventListener('dragover', e => { e.preventDefault(); docArea.classList.add('drag-over'); });
-docArea.addEventListener('dragleave', () => docArea.classList.remove('drag-over'));
-docArea.addEventListener('drop', e => {
-  e.preventDefault(); docArea.classList.remove('drag-over');
-  if(e.dataTransfer.files[0]) handleDocument(e.dataTransfer.files[0]);
+// ── Diploma ───────────────────────────────────────────────────────────────────
+let uploadedDocUrl='';
+const docArea=document.getElementById('doc-upload-area');
+const docInput=document.getElementById('doc-input');
+const docStatus=document.getElementById('doc-status');
+const docUploaded=document.getElementById('doc-uploaded');
+docArea.addEventListener('click',()=>docInput.click());
+docArea.addEventListener('dragover',e=>{e.preventDefault();docArea.classList.add('drag-over');});
+docArea.addEventListener('dragleave',()=>docArea.classList.remove('drag-over'));
+docArea.addEventListener('drop',e=>{e.preventDefault();docArea.classList.remove('drag-over');if(e.dataTransfer.files[0])handleDocument(e.dataTransfer.files[0]);});
+docInput.addEventListener('change',e=>{if(e.target.files[0])handleDocument(e.target.files[0]);});
+document.getElementById('doc-remove').addEventListener('click',()=>{
+  uploadedDocUrl='';docInput.value='';docUploaded.style.display='none';docArea.style.display='block';docStatus.textContent='';
 });
-docInput.addEventListener('change', e => { if(e.target.files[0]) handleDocument(e.target.files[0]); });
-document.getElementById('doc-remove').addEventListener('click', () => {
-  uploadedDocUrl = '';
-  docInput.value = '';
-  docUploaded.style.display = 'none';
-  docArea.style.display = 'block';
-  docStatus.textContent = '';
-});
-
-async function handleDocument(file) {
-  if(file.size > 10*1024*1024) {
-    docStatus.textContent='❌ Файл слишком большой (макс 10MB)';
-    docStatus.style.color='#e74c3c';
-    return;
-  }
-  docStatus.textContent='⏳ Загрузка документа...'; docStatus.style.color='#aaa';
-  try {
-    uploadedDocUrl = await uploadDocument(file);
-    document.getElementById('doc-name').textContent = file.name;
-    docUploaded.style.display = 'flex';
-    docArea.style.display = 'none';
-    docStatus.textContent = '✅ Документ загружен!'; docStatus.style.color='#28a745';
-  } catch(e) {
-    console.error(e);
-    docStatus.textContent='❌ Ошибка загрузки: '+(e.message||'');
-    docStatus.style.color='#e74c3c';
-  }
+async function handleDocument(file){
+  if(file.size>10*1024*1024){docStatus.textContent='❌ Файл слишком большой (макс 10MB)';docStatus.style.color='#e74c3c';return;}
+  docStatus.textContent='⏳ Загрузка...';docStatus.style.color='#aaa';
+  try{
+    uploadedDocUrl=await uploadToStorage('documents',file);
+    document.getElementById('doc-name').textContent=file.name;
+    docUploaded.style.display='flex';docArea.style.display='none';
+    docStatus.textContent='✅ Загружен!';docStatus.style.color='#28a745';
+  }catch(e){console.error(e);docStatus.textContent='❌ Ошибка: '+(e.message||'');docStatus.style.color='#e74c3c';}
 }
 
-// Modals
+// ── Modals ────────────────────────────────────────────────────────────────────
 const modal=document.getElementById('modal');
 const openModal=()=>{modal.classList.add('active');document.body.style.overflow='hidden';};
 const closeModal=()=>{modal.classList.remove('active');document.body.style.overflow='auto';};
@@ -473,7 +540,21 @@ const closeProfile=()=>{profileModal.classList.remove('active');document.body.st
 document.getElementById('close-profile-btn').addEventListener('click',closeProfile);
 profileModal.addEventListener('click',e=>{if(e.target===profileModal)closeProfile();});
 
-// Specialties
+// Policy modal — z-index выше основного, не закрывает его
+const policyModal=document.getElementById('policy-modal');
+const openPolicy=e=>{e.preventDefault();e.stopPropagation();policyModal.classList.add('active');};
+const closePolicy=()=>{policyModal.classList.remove('active');};
+document.getElementById('policy-link').addEventListener('click',openPolicy);
+document.getElementById('terms-link').addEventListener('click',openPolicy);
+document.getElementById('close-policy-btn').addEventListener('click',closePolicy);
+document.getElementById('policy-close-bottom').addEventListener('click',()=>{
+  closePolicy();
+  // Автоматически ставим галочку после прочтения
+  document.getElementById('privacy-check').checked=true;
+});
+policyModal.addEventListener('click',e=>{if(e.target===policyModal)closePolicy();});
+
+// ── Specialties ───────────────────────────────────────────────────────────────
 const SPECIALTIES={
   'Быт':['🔧 Сантехник','⚡ Электрик','🪟 Установка окон','🚪 Установка дверей','🛋️ Сборка мебели','🎨 Покраска стен','🪚 Плотник','🏗️ Ремонт квартир','🧹 Уборка','🌿 Садовник','❄️ Ремонт техники','🔑 Замочник','✏️ Другое'],
   'Проф':['⚖️ Юрист','🧾 Бухгалтер','🏥 Врач / Медик','📐 Архитектор','🏠 Риелтор','📊 Финансист','🎓 Репетитор','🌍 Переводчик','📸 Фотограф','🎥 Видеограф','💆 Массажист','✏️ Другое'],
@@ -497,18 +578,11 @@ function renderSpecialtyChips(cat){
   });
 }
 
-// ✅ При смене категории — показываем/скрываем поле документа
 document.getElementById('category').addEventListener('change',function(){
   renderSpecialtyChips(this.value);
-  const docGroup = document.getElementById('doc-group');
-  docGroup.style.display = this.value === 'Проф' ? 'block' : 'none';
-  // Сбрасываем документ при смене категории
-  if(this.value !== 'Проф') {
-    uploadedDocUrl = '';
-    docInput.value = '';
-    docUploaded.style.display = 'none';
-    docArea.style.display = 'block';
-    docStatus.textContent = '';
+  document.getElementById('doc-group').style.display=this.value==='Проф'?'block':'none';
+  if(this.value!=='Проф'){
+    uploadedDocUrl='';docInput.value='';docUploaded.style.display='none';docArea.style.display='block';docStatus.textContent='';
   }
 });
 
@@ -521,6 +595,7 @@ document.querySelectorAll('.category-btn').forEach(btn=>{
 });
 document.getElementById('search').addEventListener('input',renderServices);
 
+// ── Services ──────────────────────────────────────────────────────────────────
 async function loadServices(){
   const cont=document.getElementById('services'),empty=document.getElementById('empty');
   cont.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#bbb">⏳ Загрузка...</div>`;
@@ -544,42 +619,26 @@ function renderServices(){
   );
   if(!filtered.length){cont.innerHTML='';empty.classList.remove('hidden');return;}
   empty.classList.add('hidden');
-
   cont.innerHTML=filtered.map(s=>{
     const emoji=CAT_EMOJI[s.category]||'📦',bg=CAT_BG[s.category]||'#F5F5F5';
     const avg=s.rating_avg||0,cnt=s.rating_count||0;
-    const thumb=s.photo_url
-      ?`<img src="${esc(s.photo_url)}" onerror="this.style.display='none'">`
-      :`<span class="no-photo-emoji">${emoji}</span>`;
-    // ✅ Синяя галочка на карточке
-    const verifiedBadge = s.verified
-      ? `<div class="verified-badge" title="Верифицированный специалист">${VERIFIED_SVG}</div>`
-      : '';
+    const thumb=s.photo_url?`<img src="${esc(s.photo_url)}" onerror="this.style.display='none'">`:`<span class="no-photo-emoji">${emoji}</span>`;
+    const badge=s.verified?`<div class="verified-badge" title="Верифицированный специалист">${VERIFIED_SVG}</div>`:'';
     return `<div class="service-card" data-id="${esc(String(s.id))}">
-      <div class="card-thumb" style="${s.photo_url?'':'background:'+bg}">
-        ${thumb}
-        ${verifiedBadge}
-      </div>
+      <div class="card-thumb" style="${s.photo_url?'':'background:'+bg}">${thumb}${badge}</div>
       <div class="service-card-content">
-        <h4>${esc(s.name)}${s.verified ? `<span class="verified-badge-lg" title="Верифицирован">${VERIFIED_SVG}</span>` : ''}</h4>
+        <h4>${esc(s.name)}${s.verified?`<span class="verified-badge-lg">${VERIFIED_SVG}</span>`:''}</h4>
         <div class="card-meta-row">
           <span class="cat-label">${emoji} ${esc(s.category)}</span>
           ${s.specialty?`<span class="spec-label">${esc(s.specialty)}</span>`:''}
         </div>
-        <div class="card-rating">
-          <span class="stars">${stars(avg)}</span>
-          <span class="count">${cnt>0?`(${cnt})`:'нет отзывов'}</span>
-        </div>
+        <div class="card-rating"><span class="stars">${stars(avg)}</span><span class="count">${cnt>0?`(${cnt})`:'нет отзывов'}</span></div>
         <p class="desc">${esc(s.description||'Качественные услуги')}</p>
       </div>
     </div>`;
   }).join('');
-
   cont.querySelectorAll('.service-card').forEach(card=>{
-    card.addEventListener('click',()=>{
-      const s=services.find(x=>String(x.id)===card.dataset.id);
-      if(s)openProfile(s);
-    });
+    card.addEventListener('click',()=>{const s=services.find(x=>String(x.id)===card.dataset.id);if(s)openProfile(s);});
   });
 }
 
@@ -588,18 +647,9 @@ async function openProfile(s){
   const avg=s.rating_avg||0,cnt=s.rating_count||0;
   const hasPhone=s.phone&&s.phone.trim(),hasTg=s.telegram&&s.telegram.trim();
   const tgClean=hasTg?s.telegram.replace(/^@/,''):'';
-
-  const heroHtml=s.photo_url
-    ?`<img class="profile-hero-img" src="${esc(s.photo_url)}" onerror="this.style.display='none'">`
-    :`<div class="profile-hero-emoji">${emoji}</div>`;
-  const avatarHtml=s.photo_url
-    ?`<img src="${esc(s.photo_url)}" onerror="this.style.display='none'">`
-    :emoji;
-
-  // ✅ Синяя галочка в имени профиля
-  const verifiedTag = s.verified
-    ? `<span class="verified-badge-lg" title="Верифицированный специалист">${VERIFIED_SVG}</span>`
-    : '';
+  const heroHtml=s.photo_url?`<img class="profile-hero-img" src="${esc(s.photo_url)}" onerror="this.style.display='none'">`:`<div class="profile-hero-emoji">${emoji}</div>`;
+  const avatarHtml=s.photo_url?`<img src="${esc(s.photo_url)}" onerror="this.style.display='none'">`:`${emoji}`;
+  const vTag=s.verified?`<span class="verified-badge-lg" title="Верифицирован">${VERIFIED_SVG}</span>`:'';
 
   document.getElementById('profile-body').innerHTML=`
     <div class="profile-hero" style="${s.photo_url?'':'background:'+bg}">
@@ -607,7 +657,7 @@ async function openProfile(s){
       <div class="profile-avatar">${avatarHtml}</div>
     </div>
     <div class="profile-body">
-      <div class="profile-name">${esc(s.name)}${verifiedTag}</div>
+      <div class="profile-name">${esc(s.name)}${vTag}</div>
       <div class="profile-spec">${s.specialty?`🎯 ${esc(s.specialty)}`:`📂 ${esc(s.category)}`}</div>
       <div class="profile-meta">
         <span class="profile-badge">${emoji} ${esc(s.category)}</span>
@@ -623,10 +673,7 @@ async function openProfile(s){
         <h4>⭐ Рейтинг и отзывы</h4>
         <div class="rating-summary">
           <div class="rating-big">${avg>0?avg.toFixed(1):'—'}</div>
-          <div class="rating-right">
-            <div class="rating-stars-big">${stars(avg)}</div>
-            <div class="rating-count">${cnt} ${decl(cnt)}</div>
-          </div>
+          <div class="rating-right"><div class="rating-stars-big">${stars(avg)}</div><div class="rating-count">${cnt} ${decl(cnt)}</div></div>
         </div>
         <div class="star-picker" id="star-picker">
           ${[1,2,3,4,5].map(i=>`<button class="star-btn" data-star="${i}" type="button">⭐</button>`).join('')}
@@ -640,14 +687,12 @@ async function openProfile(s){
     </div>`;
 
   profileModal.classList.add('active');document.body.style.overflow='hidden';
-
   document.getElementById('prof-call')?.addEventListener('click',e=>{e.stopPropagation();window.location.href='tel:'+e.currentTarget.dataset.phone;});
   document.getElementById('prof-tg')?.addEventListener('click',e=>{
     e.stopPropagation();
     const url='https://t.me/'+e.currentTarget.dataset.tg;
     window.Telegram?.WebApp?.openLink?window.Telegram.WebApp.openLink(url):window.open(url,'_blank');
   });
-
   let selStar=0;
   const starBtns=document.querySelectorAll('.star-btn');
   starBtns.forEach(btn=>{
@@ -655,7 +700,6 @@ async function openProfile(s){
     btn.addEventListener('mouseover',function(){const n=+this.dataset.star;starBtns.forEach(b=>b.classList.toggle('active',+b.dataset.star<=n));});
     btn.addEventListener('mouseout',()=>starBtns.forEach(b=>b.classList.toggle('active',+b.dataset.star<=selStar)));
   });
-
   document.getElementById('submit-review').addEventListener('click',async function(){
     if(!selStar){toast('❌ Выберите оценку','#e74c3c');return;}
     this.disabled=true;this.textContent='Отправка...';
@@ -690,37 +734,44 @@ async function loadReviews(sid){
   }catch(e){cont.innerHTML=`<div class="no-reviews">Не удалось загрузить отзывы</div>`;}
 }
 
+// ── Submit ────────────────────────────────────────────────────────────────────
 document.getElementById('submit-btn').addEventListener('click',async function(){
   const name=document.getElementById('name').value.trim();
   const category=document.getElementById('category').value;
   const desc=document.getElementById('desc').value.trim();
   const phone=document.getElementById('phone').value.trim();
-  const telegramRaw=document.getElementById('telegram').value.trim();
-  // ✅ Убираем @ если пользователь всё же написал его сам
-  const telegram=telegramRaw.replace(/^@+/,'').trim();
+  const telegram=document.getElementById('telegram').value.trim().replace(/^@+/,'');
   const customVal=document.getElementById('specialty-custom').value.trim();
   const specialty=selectedSpecialty==='__custom__'?customVal:selectedSpecialty;
 
   if(!name||!category){alert('❌ Заполните имя и категорию');return;}
   if(SPECIALTIES[category]&&!specialty){alert('❌ Выберите специальность');return;}
   if(!phone&&!telegram){alert('❌ Укажите хотя бы один способ связи');return;}
+  if(!document.getElementById('privacy-check').checked){
+    toast('❌ Примите политику конфиденциальности','#e74c3c');return;
+  }
+
+  // Логика верификации:
+  // Быт / Диджитал: паспорт → галочка
+  // Проф: паспорт + диплом → галочка (оба обязательны)
+  // document_url = паспорт (для всех)
+  // diploma_url  = диплом (только Проф, отдельное поле — нужно добавить в Supabase)
 
   this.disabled=true;this.innerHTML='<span class="loading-spinner"></span> Отправка...';
   try{
-    await db.insert('services',{
-      name,
-      category,
-      specialty:specialty||'',
-      description:desc||null,
-      phone:phone||null,
-      telegram:telegram||null,
-      status:'pending',
-      photo_url:uploadedPhotoUrl||null,
-      // ✅ Передаём URL документа (только для Проф)
-      document_url: category === 'Проф' ? (uploadedDocUrl || null) : null,
-      rating_avg:0,
-      rating_count:0
-    });
+    const row={
+      name,category,specialty:specialty||'',description:desc||null,
+      phone:phone||null,telegram:telegram||null,
+      status:'pending',photo_url:uploadedPhotoUrl||null,
+      document_url:uploadedPassportUrl||null,
+      rating_avg:0,rating_count:0
+    };
+    // Для Проф передаём диплом в отдельное поле (добавь колонку diploma_url в Supabase)
+    if(category==='Проф') row.diploma_url=uploadedDocUrl||null;
+
+    await db.insert('services',row);
+
+    // Сброс
     ['name','desc','phone','telegram','specialty-custom'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('category').value='';
     selectedSpecialty='';renderSpecialtyChips('');
@@ -728,12 +779,12 @@ document.getElementById('submit-btn').addEventListener('click',async function(){
     document.getElementById('photo-preview').style.display='none';
     document.getElementById('photo-placeholder').style.display='block';
     photoInput.value='';
-    // Сбрасываем документ
-    uploadedDocUrl='';docInput.value='';
-    docUploaded.style.display='none';docArea.style.display='block';
-    docStatus.textContent='';
+    uploadedPassportUrl='';passportInput.value='';passportUploaded.style.display='none';passportArea.style.display='block';passportStatus.textContent='';
+    uploadedDocUrl='';docInput.value='';docUploaded.style.display='none';docArea.style.display='block';docStatus.textContent='';
     document.getElementById('doc-group').style.display='none';
-    closeModal();toast('✅ Заявка отправлена! Ожидайте проверки.');
+    document.getElementById('privacy-check').checked=false;
+    closeModal();
+    toast('✅ Заявка отправлена! Ожидайте проверки.');
   }catch(e){console.error(e);alert('❌ Ошибка: '+(e.message||'Не удалось отправить'));}
   finally{this.disabled=false;this.innerHTML='✅ Добавить услугу';}
 });
