@@ -540,6 +540,28 @@ const closeProfile=()=>{profileModal.classList.remove('active');document.body.st
 document.getElementById('close-profile-btn').addEventListener('click',closeProfile);
 profileModal.addEventListener('click',e=>{if(e.target===profileModal)closeProfile();});
 
+// ✅ Делегированные обработчики — один раз, не дублируются при каждом открытии
+profileModal.addEventListener('click',e=>{
+  const callBtn=e.target.closest('#prof-call');
+  if(callBtn){
+    e.stopPropagation();
+    const raw=callBtn.dataset.phone||'';
+    const phone=raw.replace(/[^+\d]/g,'');
+    if(!phone)return;
+    const twa=window.Telegram?.WebApp;
+    if(twa?.openLink){twa.openLink('tel:'+phone);}
+    else{window.location.href='tel:'+phone;}
+  }
+  const tgBtn=e.target.closest('#prof-tg');
+  if(tgBtn){
+    e.stopPropagation();
+    const url='https://t.me/'+tgBtn.dataset.tg;
+    const twa=window.Telegram?.WebApp;
+    if(twa?.openLink){twa.openLink(url);}
+    else{window.open(url,'_blank');}
+  }
+});
+
 // Policy modal — z-index выше основного, не закрывает его
 const policyModal=document.getElementById('policy-modal');
 const openPolicy=e=>{e.preventDefault();e.stopPropagation();policyModal.classList.add('active');};
@@ -687,19 +709,7 @@ async function openProfile(s){
     </div>`;
 
   profileModal.classList.add('active');document.body.style.overflow='hidden';
-  document.getElementById('prof-call')?.addEventListener('click',e=>{
-    e.stopPropagation();
-    const raw=e.currentTarget.dataset.phone||'';
-    const phone=raw.replace(/[^+\d]/g,'');
-    const twa=window.Telegram?.WebApp;
-    if(twa?.openLink){twa.openLink('tel:'+phone);}
-    else{window.location.href='tel:'+phone;}
-  });
-  document.getElementById('prof-tg')?.addEventListener('click',e=>{
-    e.stopPropagation();
-    const url='https://t.me/'+e.currentTarget.dataset.tg;
-    window.Telegram?.WebApp?.openLink?window.Telegram.WebApp.openLink(url):window.open(url,'_blank');
-  });
+  // контакты обрабатываются делегированием выше
   let selStar=0;
   const starBtns=document.querySelectorAll('.star-btn');
   starBtns.forEach(btn=>{
