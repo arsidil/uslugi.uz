@@ -687,7 +687,14 @@ async function openProfile(s){
     </div>`;
 
   profileModal.classList.add('active');document.body.style.overflow='hidden';
-  document.getElementById('prof-call')?.addEventListener('click',e=>{e.stopPropagation();window.location.href='tel:'+e.currentTarget.dataset.phone;});
+  document.getElementById('prof-call')?.addEventListener('click',e=>{
+    e.stopPropagation();
+    const raw=e.currentTarget.dataset.phone||'';
+    const phone=raw.replace(/[^+\d]/g,'');
+    const twa=window.Telegram?.WebApp;
+    if(twa?.openLink){twa.openLink('tel:'+phone);}
+    else{window.location.href='tel:'+phone;}
+  });
   document.getElementById('prof-tg')?.addEventListener('click',e=>{
     e.stopPropagation();
     const url='https://t.me/'+e.currentTarget.dataset.tg;
