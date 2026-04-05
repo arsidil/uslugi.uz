@@ -71,6 +71,14 @@
 
   .call-btn { background:linear-gradient(135deg,#8B3E3A,#A64844); color:white; border:none; border-radius:10px; padding:9px 10px; font-size:0.78rem; font-weight:700; font-family:'Montserrat',sans-serif; cursor:pointer; display:block; text-align:center; transition:all 0.2s; width:100%; box-shadow:0 4px 12px rgba(139,62,58,0.35),inset 0 1px 0 rgba(255,255,255,0.15); }
   .call-btn:active { transform:scale(0.95) translateY(1px); }
+  .phone-popup { position:fixed; bottom:0; left:0; right:0; z-index:200; padding:0 0 env(safe-area-inset-bottom,0); }
+  .phone-popup-inner { background:white; border-radius:24px 24px 0 0; padding:24px 20px 28px; box-shadow:0 -8px 40px rgba(0,0,0,0.2); max-width:500px; margin:0 auto; }
+  .phone-popup-number { font-size:1.35rem; font-weight:700; color:#1a1a1a; text-align:center; letter-spacing:0.03em; margin:12px 0 20px; }
+  .phone-popup-title { font-size:0.8rem; font-weight:600; color:#aaa; text-align:center; text-transform:uppercase; letter-spacing:0.08em; }
+  .phone-popup-copy { background:linear-gradient(135deg,#8B3E3A,#A64844); color:white; border:none; border-radius:14px; padding:14px; font-size:1rem; font-weight:700; font-family:'Montserrat',sans-serif; cursor:pointer; width:100%; box-shadow:0 6px 20px rgba(139,62,58,0.4); transition:all 0.2s; }
+  .phone-popup-copy:active { transform:scale(0.97); }
+  .phone-popup-cancel { background:none; border:none; color:#aaa; font-size:0.9rem; font-weight:600; font-family:'Montserrat',sans-serif; cursor:pointer; width:100%; padding:12px; margin-top:4px; }
+  .phone-popup-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:199; }
   .tg-btn { background:white; color:#0088cc; border:2px solid #e0f3fc; border-radius:10px; padding:7px 10px; font-size:0.75rem; font-weight:700; font-family:'Montserrat',sans-serif; cursor:pointer; display:block; text-align:center; transition:all 0.2s; width:100%; margin-top:6px; box-shadow:0 2px 6px rgba(0,136,204,0.12); }
   .tg-btn:active { transform:scale(0.95); }
 
@@ -545,10 +553,9 @@ profileModal.addEventListener('click',e=>{
   const callBtn=e.target.closest('#prof-call');
   if(callBtn){
     e.stopPropagation();
-    const raw=callBtn.dataset.phone||'';
-    const phone=raw.replace(/[^+\d]/g,'');
+    const phone=callBtn.dataset.phone||'';
     if(!phone)return;
-    window.open('tel:'+phone,'_self');
+    showPhonePopup(phone);
   }
   const tgBtn=e.target.closest('#prof-tg');
   if(tgBtn){
@@ -803,6 +810,42 @@ document.getElementById('submit-btn').addEventListener('click',async function(){
   }catch(e){console.error(e);alert('❌ Ошибка: '+(e.message||'Не удалось отправить'));}
   finally{this.disabled=false;this.innerHTML='✅ Добавить услугу';}
 });
+
+function showPhonePopup(phone){
+  const ov=document.createElement('div');
+  ov.className='phone-popup-overlay';
+  const pop=document.createElement('div');
+  pop.className='phone-popup';
+  pop.innerHTML=`
+    <div class="phone-popup-inner">
+      <div class="phone-popup-title">Номер телефона</div>
+      <div class="phone-popup-number">${phone}</div>
+      <button class="phone-popup-copy">📋 Скопировать номер</button>
+      <button class="phone-popup-cancel">Отмена</button>
+    </div>`;
+  const close=()=>{ov.remove();pop.remove();};
+  ov.addEventListener('click',close);
+  pop.querySelector('.phone-popup-cancel').addEventListener('click',close);
+  pop.querySelector('.phone-popup-copy').addEventListener('click',()=>{
+    const clean=phone.replace(/[^+\d]/g,'');
+    if(navigator.clipboard?.writeText){
+      navigator.clipboard.writeText(clean).then(()=>{
+        toast('✅ Номер скопирован!');
+        close();
+      }).catch(()=>fallbackCopy(clean,close));
+    } else { fallbackCopy(clean,close); }
+  });
+  document.body.appendChild(ov);
+  document.body.appendChild(pop);
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');toast('✅ Номер скопирован!');cb();}
+  catch{toast('❌ Не удалось скопировать','#e74c3c');}
+  ta.remove();
+}
 
 loadServices();
 </script>
