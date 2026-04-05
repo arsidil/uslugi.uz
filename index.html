@@ -548,9 +548,7 @@ profileModal.addEventListener('click',e=>{
     const raw=callBtn.dataset.phone||'';
     const phone=raw.replace(/[^+\d]/g,'');
     if(!phone)return;
-    const twa=window.Telegram?.WebApp;
-    if(twa?.openLink){twa.openLink('tel:'+phone);}
-    else{window.location.href='tel:'+phone;}
+    window.open('tel:'+phone,'_self');
   }
   const tgBtn=e.target.closest('#prof-tg');
   if(tgBtn){
