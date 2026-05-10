@@ -187,7 +187,7 @@
   .btn-review:disabled { opacity:0.5; cursor:not-allowed; }
   .reviews-list { display:flex; flex-direction:column; gap:12px; margin-top:16px; }
   .review-item { background:#fafafa; border-radius:14px; padding:12px 14px; border:1px solid #f0f0f0; }
-  .review-item-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .review-item-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px; }
   .review-item-stars { font-size:0.85rem; }
   .review-item-date { font-size:0.72rem; color:#ccc; font-weight:600; }
   .review-item-text { font-size:0.82rem; color:#555; line-height:1.5; }
@@ -426,6 +426,38 @@
 <script>
 const SUPABASE_URL  = 'https://sqsbqsizbzcddbzbaigw.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxc2Jxc2l6YnpjZGRiemJhaWd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDU5MjgsImV4cCI6MjA4OTY4MTkyOH0.4K3aFA-d1NkXfw8PfshW-CphdzzSFHEZ9qiKASZN9sA';
+
+// ── TG User (глобальный, доступен везде) ─────────────────────────────────────
+let currentTgUser = null;
+
+async function initTgUser() {
+  const twa = window.Telegram?.WebApp;
+  if (!twa) return;
+  twa.ready();
+  const u = twa.initDataUnsafe?.user;
+  if (!u?.id) return;
+  currentTgUser = u; // { id, first_name, last_name, username, photo_url }
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/tg_users`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        tg_id:      u.id,
+        username:   u.username   || null,
+        first_name: u.first_name || null,
+        last_name:  u.last_name  || null,
+        photo_url:  u.photo_url  || null,
+        updated_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { console.warn('tg_users upsert failed:', e.message); }
+}
+initTgUser();
 
 async function sbFetch(path, opts={}) {
   const res = await fetch(`${SUPABASE_URL}${path}`, {
@@ -747,7 +779,7 @@ async function openProfile(s){
     this.disabled=true;this.textContent='Отправка...';
     const text=document.getElementById('review-text').value.trim(),sid=this.dataset.sid;
     try{
-      await db.insert('reviews',{service_id:sid,rating:selStar,text:text||null});
+      await db.insert('reviews',{service_id:sid,rating:selStar,text:text||null,author_tg_id:currentTgUser?.id||null});
       const revs=await db.select('reviews',`service_id=eq.${sid}&select=rating`);
       const newAvg=Math.round(revs.reduce((s,r)=>s+r.rating,0)/revs.length*10)/10;
       await db.update('services',`id=eq.${sid}`,{rating_avg:newAvg,rating_count:revs.length});
@@ -766,10 +798,33 @@ async function loadReviews(sid){
   try{
     const revs=await db.select('reviews',`service_id=eq.${sid}&order=created_at.desc`);
     if(!revs||!revs.length){cont.innerHTML=`<div class="no-reviews">Пока нет отзывов. Будьте первым! 🌟</div>`;return;}
+
+    // Подтягиваем авторов одним запросом
+    const authorIds=[...new Set(revs.map(r=>r.author_tg_id).filter(Boolean))];
+    let authorsMap={};
+    if(authorIds.length){
+      const authors=await db.select('tg_users',`tg_id=in.(${authorIds.join(',')})`);
+      authors.forEach(a=>authorsMap[a.tg_id]=a);
+    }
+
     cont.innerHTML=revs.map(r=>{
       const d=r.created_at?new Date(r.created_at).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}):'';
+      const author=authorsMap[r.author_tg_id];
+      const authorName=author?(author.first_name||'')+(author.last_name?' '+author.last_name:''):'Аноним';
+      const avatarHtml=author?.photo_url
+        ?`<img src="${esc(author.photo_url)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`
+        :`<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B3E3A,#A64844);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:white;font-weight:700;flex-shrink:0;">${esc(authorName[0]||'?')}</div>`;
       return `<div class="review-item">
-        <div class="review-item-header"><span class="review-item-stars">${stars(r.rating)}</span><span class="review-item-date">${d}</span></div>
+        <div class="review-item-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${avatarHtml}
+            <div>
+              <div style="font-size:0.78rem;font-weight:700;color:#1a1a1a;line-height:1.2;">${esc(authorName)}</div>
+              <div class="review-item-stars">${stars(r.rating)}</div>
+            </div>
+          </div>
+          <span class="review-item-date">${d}</span>
+        </div>
         ${r.text?`<div class="review-item-text">${esc(r.text)}</div>`:''}
       </div>`;
     }).join('');
@@ -806,7 +861,8 @@ document.getElementById('submit-btn').addEventListener('click',async function(){
       phone:phone||null,telegram:telegram||null,
       status:'pending',photo_url:uploadedPhotoUrl||null,
       document_url:uploadedPassportUrl||null,
-      rating_avg:0,rating_count:0
+      rating_avg:0,rating_count:0,
+      tg_id: currentTgUser?.id || null
     };
     // Для Проф передаём диплом в отдельное поле (добавь колонку diploma_url в Supabase)
     if(category==='Проф') row.diploma_url=uploadedDocUrl||null;
