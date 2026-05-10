@@ -15,6 +15,18 @@
   .btn-primary { background:linear-gradient(135deg,#8B3E3A,#A64844); border:none; cursor:pointer; color:white; padding:11px 18px; border-radius:20px; font-weight:700; font-size:0.9rem; font-family:'Montserrat',sans-serif; transition:all 0.25s; box-shadow:0 4px 15px rgba(139,62,58,0.45),inset 0 1px 0 rgba(255,255,255,0.15); }
   .btn-primary:active { transform:scale(0.95) translateY(1px); }
 
+  .user-chip { display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 10px 4px 4px; border-radius:20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); transition:background 0.2s; max-width:140px; }
+  .user-chip:active { background:rgba(255,255,255,0.15); }
+  .user-chip-avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid rgba(212,181,160,0.5); }
+  .user-chip-avatar-placeholder { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#8B3E3A,#A64844); display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; color:white; flex-shrink:0; border:2px solid rgba(212,181,160,0.5); }
+  .user-chip-name { font-size:0.72rem; font-weight:700; color:rgba(255,255,255,0.85); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .user-popup { position:fixed; top:70px; left:16px; z-index:100; background:#1e1e1e; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:16px; min-width:220px; box-shadow:0 8px 32px rgba(0,0,0,0.4); display:none; }
+  .user-popup.active { display:block; }
+  .user-popup-avatar { width:56px; height:56px; border-radius:50%; object-fit:cover; border:3px solid #8B3E3A; margin-bottom:10px; }
+  .user-popup-avatar-placeholder { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#8B3E3A,#A64844); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:white; margin-bottom:10px; }
+  .user-popup-name { font-size:0.95rem; font-weight:700; color:white; margin-bottom:2px; }
+  .user-popup-username { font-size:0.78rem; color:#aaa; }
+
   .hero { padding:20px; }
   .hero h2 { font-size:1.2rem; font-weight:700; color:#1a1a1a; margin-bottom:12px; }
   .search-wrap { position:relative; }
@@ -210,9 +222,18 @@
 <body>
 <div id="app">
   <header>
+    <div id="user-chip" class="user-chip" style="display:none;">
+      <div class="user-chip-avatar-placeholder" id="chip-avatar-placeholder">?</div>
+      <span class="user-chip-name" id="chip-name"></span>
+    </div>
     <h1>USLUGI.UZ</h1>
     <button id="open-modal-btn" class="btn-primary">➕ Добавить услугу</button>
   </header>
+  <div id="user-popup" class="user-popup">
+    <div id="popup-avatar-wrap"></div>
+    <div class="user-popup-name" id="popup-name"></div>
+    <div class="user-popup-username" id="popup-username"></div>
+  </div>
   <section class="hero">
     <h2>🔍 Найди специалиста</h2>
     <div class="search-wrap">
@@ -436,7 +457,41 @@ async function initTgUser() {
   twa.ready();
   const u = twa.initDataUnsafe?.user;
   if (!u?.id) return;
-  currentTgUser = u; // { id, first_name, last_name, username, photo_url }
+  currentTgUser = u;
+
+  // ── Рендер чипа в хедере ──────────────────────────────────────────────────
+  const chip = document.getElementById('user-chip');
+  const chipName = document.getElementById('chip-name');
+  const chipPlaceholder = document.getElementById('chip-avatar-placeholder');
+  const fullName = [u.first_name, u.last_name].filter(Boolean).join(' ');
+  chipName.textContent = u.first_name || u.username || 'Аккаунт';
+
+  if (u.photo_url) {
+    const img = document.createElement('img');
+    img.src = u.photo_url;
+    img.className = 'user-chip-avatar';
+    img.onerror = () => { chipPlaceholder.textContent = (fullName[0]||'?').toUpperCase(); };
+    chipPlaceholder.replaceWith(img);
+  } else {
+    chipPlaceholder.textContent = (fullName[0]||'?').toUpperCase();
+  }
+  chip.style.display = 'flex';
+
+  // ── Попап с подробной инфой ───────────────────────────────────────────────
+  const popup = document.getElementById('user-popup');
+  const avatarWrap = document.getElementById('popup-avatar-wrap');
+  if (u.photo_url) {
+    avatarWrap.innerHTML = `<img src="${u.photo_url}" class="user-popup-avatar" onerror="this.style.display='none'">`;
+  } else {
+    avatarWrap.innerHTML = `<div class="user-popup-avatar-placeholder">${(fullName[0]||'?').toUpperCase()}</div>`;
+  }
+  document.getElementById('popup-name').textContent = fullName || u.username || 'Пользователь';
+  document.getElementById('popup-username').textContent = u.username ? '@' + u.username : 'Telegram пользователь';
+
+  chip.addEventListener('click', e => { e.stopPropagation(); popup.classList.toggle('active'); });
+  document.addEventListener('click', () => popup.classList.remove('active'));
+
+  // ── Upsert в базу ─────────────────────────────────────────────────────────
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/tg_users`, {
       method: 'POST',
@@ -457,7 +512,8 @@ async function initTgUser() {
     });
   } catch(e) { console.warn('tg_users upsert failed:', e.message); }
 }
-initTgUser();
+// Ждём DOM перед initTgUser чтобы чип точно был в DOM
+document.addEventListener('DOMContentLoaded', initTgUser);
 
 async function sbFetch(path, opts={}) {
   const res = await fetch(`${SUPABASE_URL}${path}`, {
