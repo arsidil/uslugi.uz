@@ -222,9 +222,9 @@
 <body>
 <div id="app">
   <header>
-    <div id="user-chip" class="user-chip" style="display:none;">
-      <div class="user-chip-avatar-placeholder" id="chip-avatar-placeholder">?</div>
-      <span class="user-chip-name" id="chip-name"></span>
+    <div id="user-chip" class="user-chip">
+      <div class="user-chip-avatar-placeholder" id="chip-avatar-placeholder">👤</div>
+      <span class="user-chip-name" id="chip-name">Профиль</span>
     </div>
     <h1>USLUGI.UZ</h1>
     <button id="open-modal-btn" class="btn-primary">➕ Добавить услугу</button>
@@ -453,10 +453,15 @@ let currentTgUser = null;
 
 async function initTgUser() {
   const twa = window.Telegram?.WebApp;
-  if (!twa) return;
-  twa.ready();
-  const u = twa.initDataUnsafe?.user;
-  if (!u?.id) return;
+  if (twa) twa.ready();
+  const u = twa?.initDataUnsafe?.user;
+
+  // Если Telegram не передал user — показываем гостевой чип
+  if (!u?.id) {
+    document.getElementById('chip-name').textContent = 'Гость';
+    document.getElementById('chip-avatar-placeholder').textContent = '👤';
+    return;
+  }
   currentTgUser = u;
 
   // ── Рендер чипа в хедере ──────────────────────────────────────────────────
@@ -475,7 +480,7 @@ async function initTgUser() {
   } else {
     chipPlaceholder.textContent = (fullName[0]||'?').toUpperCase();
   }
-  chip.style.display = 'flex';
+  // chip уже видим изначально
 
   // ── Попап с подробной инфой ───────────────────────────────────────────────
   const popup = document.getElementById('user-popup');
