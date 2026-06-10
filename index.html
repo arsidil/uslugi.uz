@@ -466,10 +466,17 @@ async function initTgUser() {
   // ── Рендер аватарки в хедере ────────────────────────────────────────────
   const avatarBtn = document.getElementById('user-avatar-btn');
   const fullName = [u.first_name, u.last_name].filter(Boolean).join(' ');
+  const initial = (fullName[0] || (u.username||'?')[0]).toUpperCase();
+  // Сразу убираем SVG-заглушку
+  avatarBtn.innerHTML = '';
   if (u.photo_url) {
-    avatarBtn.innerHTML = `<img src="${u.photo_url}" onerror="this.parentElement.innerHTML='<span style=\"color:white;font-size:1rem;font-weight:700;\">${(fullName[0]||'?').toUpperCase()}</span>'">`;
+    const img = document.createElement('img');
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;';
+    img.onerror = () => { avatarBtn.innerHTML = `<span style="color:white;font-size:1rem;font-weight:700;line-height:1;">${initial}</span>`; };
+    img.src = u.photo_url;
+    avatarBtn.appendChild(img);
   } else {
-    avatarBtn.innerHTML = `<span style="color:white;font-size:1rem;font-weight:700;">${(fullName[0]||'?').toUpperCase()}</span>`;
+    avatarBtn.innerHTML = `<span style="color:white;font-size:1rem;font-weight:700;line-height:1;">${initial}</span>`;
   }
 
   // ── Попап с подробной инфой ───────────────────────────────────────────────
