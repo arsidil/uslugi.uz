@@ -42,6 +42,42 @@ async function saveUser(chatId, username) {
   }
 }
 
+// ─── ОТЛОЖЕННАЯ РАССЫЛКА ЧЕРЕЗ 3 ЧАСА ПОСЛЕ /start ───────────────────────────
+const DELAYED_PHOTO_URL =
+  `${SUPABASE_URL}/storage/v1/object/public/broadcast-photos/public/welcome1-3.png`;
+
+const DELAYED_TEXT =
+`Привет! 💛
+
+Тут можно не только искать специалистов, но и самому попасть в базу.
+
+Если умеешь что-то делать — добавь анкету. Возможно, кто-то уже ищет именно тебя.`;
+
+const DELAY_MS = 3 * 60 * 60 * 1000; // 3 часа
+
+// Множество chat_id, которым уже запланирована отложенная рассылка
+// (защита от повторного /start — не шлём второй раз)
+const scheduledDelayed = new Set();
+
+async function sendDelayedMessage(chatId) {
+  try {
+    await bot.telegram.sendPhoto(chatId, DELAYED_PHOTO_URL, {
+      caption: DELAYED_TEXT,
+      parse_mode: 'Markdown',
+      ...Markup.inlineKeyboard([
+        [Markup.button.url('🌟 Стать специалистом', 'https://uslugi-uz.vercel.app/')]
+      ])
+    });
+    console.log(`📨 Отложенное сообщение отправлено: ${chatId}`);
+  } catch (e) {
+    console.warn(`Delayed msg failed for ${chatId}:`, e.message);
+  } finally {
+    scheduledDelayed.delete(chatId);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+
 const WELCOME_TEXT =
 `👋 Добро пожаловать в *USLUGI.UZ*!
 
@@ -55,6 +91,14 @@ const appButton = () => Markup.inlineKeyboard([
 
 bot.start(async ctx => {
   await saveUser(ctx.chat.id, ctx.from?.username);
+
+  // Запускаем отложенное сообщение через 3 часа (только один раз на пользователя)
+  if (!scheduledDelayed.has(ctx.chat.id)) {
+    scheduledDelayed.add(ctx.chat.id);
+    setTimeout(() => sendDelayedMessage(ctx.chat.id), DELAY_MS);
+    console.log(`⏳ Отложенное сообщение запланировано для ${ctx.chat.id}`);
+  }
+
   return ctx.reply(WELCOME_TEXT, { parse_mode: 'Markdown', ...appButton() });
 });
 
